@@ -29,7 +29,7 @@ variable "region" {
 
 variable "ocp_version" {
   type    = string
-  default = "4.12.0"
+  default = "4.12.7"
 }
 
 variable "vpc_cidr" {
