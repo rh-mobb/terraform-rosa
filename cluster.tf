@@ -50,9 +50,13 @@ resource "ocm_cluster_rosa_classic" "rosa" {
   sts        = local.sts_roles
 
   disable_waiting_in_destroy = false
+
+  depends_on = [module.network]
 }
 
 resource "ocm_cluster_wait" "rosa" {
   cluster = ocm_cluster_rosa_classic.rosa.id
   timeout = 60
+
+  depends_on = [module.operator_roles]
 }
