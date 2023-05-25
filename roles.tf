@@ -22,8 +22,8 @@ module "account_roles" {
 # iam operator roles and oidc provider
 #
 data "ocm_rosa_operator_roles" "operator_roles" {
-  operator_role_prefix = var.cluster_name
-  account_role_prefix  = var.cluster_name
+  operator_role_prefix = ocm_cluster_rosa_classic.rosa.name
+  account_role_prefix  = ocm_cluster_rosa_classic.rosa.name
 }
 
 module "operator_roles" {
