@@ -51,7 +51,7 @@ resource "ocm_cluster_rosa_classic" "rosa" {
 
   disable_waiting_in_destroy = false
 
-  depends_on = [module.network]
+  depends_on = [module.network, module.account_roles]
 }
 
 resource "ocm_cluster_wait" "rosa" {
