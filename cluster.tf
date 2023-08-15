@@ -25,7 +25,7 @@ locals {
 #
 # cluster
 #
-resource "ocm_cluster_rosa_classic" "rosa" {
+resource "rhcs_cluster_rosa_classic" "rosa" {
   name = var.cluster_name
 
   # aws
@@ -46,7 +46,7 @@ resource "ocm_cluster_rosa_classic" "rosa" {
 
   # rosa / openshift
   properties = { rosa_creator_arn = data.aws_caller_identity.current.arn }
-  version    = "openshift-v${var.ocp_version}"
+  version    = var.ocp_version
   sts        = local.sts_roles
 
   disable_waiting_in_destroy = false
@@ -54,8 +54,8 @@ resource "ocm_cluster_rosa_classic" "rosa" {
   depends_on = [module.network, module.account_roles]
 }
 
-resource "ocm_cluster_wait" "rosa" {
-  cluster = ocm_cluster_rosa_classic.rosa.id
+resource "rhcs_cluster_wait" "rosa" {
+  cluster = rhcs_cluster_rosa_classic.rosa.id
   timeout = 60
 
   depends_on = [module.operator_roles]
