@@ -25,6 +25,10 @@ locals {
 #
 # cluster
 #
+local {
+  subnet_ids = var.private ? module.network.private_subnet_ids : concat(module.network.private_subnet_ids, module.network.public_subnet_ids)
+}
+
 resource "rhcs_cluster_rosa_classic" "rosa" {
   name = var.cluster_name
 
@@ -40,7 +44,7 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
 
   # network
   aws_private_link   = var.private
-  aws_subnet_ids     = concat(module.network.private_subnet_ids, module.network.public_subnet_ids)
+  aws_subnet_ids     = local.subnet_ids
   machine_cidr       = var.vpc_cidr
   availability_zones = module.network.private_subnet_azs
 
