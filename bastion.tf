@@ -31,8 +31,9 @@ resource "aws_key_pair" "bastion_host" {
 
   key_name   = "${var.cluster_name}-bastion"
   public_key = file(var.bastion_public_ssh_key)
+
   tags = {
-    Name = "${local.name}_bastion_key_pair"
+    Name = "${var.cluster_name}-bastion"
   }
 }
 
