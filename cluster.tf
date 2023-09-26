@@ -25,7 +25,7 @@ locals {
 #
 # cluster
 #
-local {
+locals {
   subnet_ids = var.private ? module.network.private_subnet_ids : concat(module.network.private_subnet_ids, module.network.public_subnet_ids)
 }
 
