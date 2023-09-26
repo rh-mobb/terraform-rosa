@@ -3,6 +3,11 @@ variable "private" {
   default = false
 }
 
+variable "bastion_public_ssh_key" {
+  type    = string
+  default = "~/.ssh/id_rsa.pub"
+}
+
 variable "multi_az" {
   type    = bool
   default = false
