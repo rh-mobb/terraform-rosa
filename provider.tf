@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     rhcs = {
-      version = ">= 1.4.0-prerelease.1"
+      version = ">= 1.2.2"
       source  = "terraform-redhat/rhcs"
     }
 
