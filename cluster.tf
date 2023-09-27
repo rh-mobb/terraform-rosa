@@ -43,6 +43,7 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   max_replicas        = var.autoscaling ? local.autoscaling_max : null
 
   # network
+  private            = var.private
   aws_private_link   = var.private
   aws_subnet_ids     = local.subnet_ids
   machine_cidr       = var.vpc_cidr
