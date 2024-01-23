@@ -6,7 +6,7 @@ resource "rhcs_identity_provider" "admin" {
   htpasswd = {
     users = [{
       username = "admin"
-      password = "<user-password>"
+      password = var.admin_password
       },
     ]
   }
@@ -20,7 +20,7 @@ resource "rhcs_identity_provider" "developer" {
   htpasswd = {
     users = [{
       username = "developer"
-      password = "<user-password>"
+      password = var.developer_password
       },
     ]
   }
