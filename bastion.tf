@@ -32,9 +32,11 @@ resource "aws_key_pair" "bastion_host" {
   key_name   = "${var.cluster_name}-bastion"
   public_key = file(var.bastion_public_ssh_key)
 
-  tags = {
-    Name = "${var.cluster_name}-bastion"
-  }
+  tags = merge(var.tags,
+    {
+      "Name" = "${var.cluster_name}-bastion"
+    }
+  )
 }
 
 resource "aws_security_group" "bastion_host" {
@@ -61,9 +63,11 @@ resource "aws_security_group" "bastion_host" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "${var.cluster_name}-bastion"
-  }
+  tags = merge(var.tags,
+    {
+      "Name" = "${var.cluster_name}-bastion"
+    }
+  )
 }
 
 resource "aws_instance" "bastion_host" {
@@ -75,9 +79,11 @@ resource "aws_instance" "bastion_host" {
   key_name               = aws_key_pair.bastion_host[0].key_name
   vpc_security_group_ids = [aws_security_group.bastion_host[0].id]
 
-  tags = {
-    Name = "${var.cluster_name}-bastion"
-  }
+  tags = merge(var.tags,
+    {
+      "Name" = "${var.cluster_name}-bastion"
+    }
+  )
 
   user_data = <<EOF
 #!/bin/bash

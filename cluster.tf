@@ -15,11 +15,6 @@ locals {
   # autoscaling
   autoscaling_min = var.multi_az ? 3 : 2
   autoscaling_max = var.multi_az ? 6 : 4
-
-  # required owner tag
-  tags = {
-    "owner" = data.aws_caller_identity.current.arn
-  }
 }
 
 #
@@ -35,7 +30,7 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   # aws
   cloud_region   = var.region
   aws_account_id = data.aws_caller_identity.current.account_id
-  tags           = local.tags
+  tags           = var.tags
 
   # autoscaling
   autoscaling_enabled = var.autoscaling

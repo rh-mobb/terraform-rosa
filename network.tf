@@ -11,5 +11,5 @@ module "network" {
     private_subnet_ids = []
   }
 
-  tags = local.tags
+  tags = var.tags
 }

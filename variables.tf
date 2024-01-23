@@ -34,7 +34,7 @@ variable "region" {
 
 variable "ocp_version" {
   type    = string
-  default = "4.12.7"
+  default = "4.14.7"
 }
 
 variable "vpc_cidr" {
@@ -45,4 +45,24 @@ variable "vpc_cidr" {
 variable "subnet_cidr_size" {
   type    = number
   default = 20
+}
+
+variable "tags" {
+  description = "Tags applied to all objects"
+  type        = map(string)
+  default = {
+    "owner" = "dscott"
+  }
+}
+
+variable "admin_password" {
+  description = "Password for the 'admin' user. IDP is not created if unspecified."
+  type        = string
+  sensitive   = true
+}
+
+variable "developer_password" {
+  description = "Password for the 'developer' user. IDP is not created if unspecified."
+  type        = string
+  sensitive   = true
 }
