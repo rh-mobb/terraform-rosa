@@ -1,5 +1,5 @@
 module "network" {
-  source = "git::https://github.com/scottd018-demos/terraform-rosa-networking.git?ref=v0.0.1"
+  source = "git::https://github.com/scottd018-demos/terraform-rosa-networking.git?ref=v0.0.2"
 
   network = {
     private_link       = var.private
