@@ -15,3 +15,7 @@ terraform {
 provider "rhcs" {
   token = var.token
 }
+
+provider "aws" {
+  region = var.region
+}
