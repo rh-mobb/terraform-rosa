@@ -30,7 +30,7 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   name = var.cluster_name
 
   # aws
-  cloud_region   = data.aws_region.current.name
+  cloud_region   = var.region
   aws_account_id = data.aws_caller_identity.current.account_id
   tags           = var.tags
 
