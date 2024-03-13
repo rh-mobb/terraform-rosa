@@ -42,6 +42,16 @@ variable "subnet_cidr_size" {
   default = 20
 }
 
+variable "pod_cidr" {
+  type    = string
+  default = "10.128.0.0/14"
+}
+
+variable "service_cidr" {
+  type    = string
+  default = "172.30.0.0/16"
+}
+
 variable "tags" {
   description = "Tags applied to all objects"
   type        = map(string)

@@ -46,6 +46,8 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   machine_cidr       = var.vpc_cidr
   availability_zones = module.network.private_subnet_azs
   multi_az           = var.multi_az
+  pod_cidr           = var.pod_cidr
+  service_cidr       = var.service_cidr
 
   # rosa / openshift
   properties = { rosa_creator_arn = data.aws_caller_identity.current.arn }
