@@ -1,8 +1,9 @@
 module "network" {
   source = "git::https://github.com/scottd018-demos/terraform-rosa-networking.git?ref=v0.0.5"
 
+  cluster_name = var.cluster_name
+
   network = {
-    cluster_name       = var.cluster_name
     private_link       = var.private
     multi_az           = var.multi_az
     vpc_network        = split("/", var.vpc_cidr)[0]
