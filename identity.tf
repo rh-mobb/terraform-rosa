@@ -27,5 +27,5 @@ resource "rhcs_identity_provider" "developer" {
     ]
   }
 
-  depends_on = [rhcs_cluster_rosa_classic.rosa]
+  depends_on = [rhcs_cluster_wait.rosa]
 }
