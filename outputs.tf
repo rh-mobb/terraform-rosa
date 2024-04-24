@@ -19,9 +19,9 @@ output "private_subnet_azs" {
 }
 
 output "oidc_config_id" {
-  value = rhcs_cluster_rosa_classic.rosa.sts.oidc_config_id
+  value = local.cluster_oidc_config_id
 }
 
 output "oidc_endpoint_url" {
-  value = rhcs_cluster_rosa_classic.rosa.sts.oidc_endpoint_url
+  value = local.cluster_oidc_endpoint_url
 }

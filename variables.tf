@@ -13,6 +13,11 @@ variable "multi_az" {
   default = false
 }
 
+variable "hosted_control_plane" {
+  type    = bool
+  default = false
+}
+
 variable "autoscaling" {
   type    = bool
   default = true
