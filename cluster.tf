@@ -79,7 +79,7 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
 
   disable_waiting_in_destroy          = false
   wait_for_create_complete            = true
-  wait_for_std_compute_nodes_complete = false
+  wait_for_std_compute_nodes_complete = true
 }
 
 locals {
