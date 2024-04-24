@@ -100,13 +100,19 @@ module "operator_roles_hcp" {
 #   NOTE: this is the sts role black that is passed into the cluster creation process
 #
 locals {
-  role_prefix        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.cluster_name}"
+  role_prefix = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.cluster_name}"
+
+  # account roles
   installer_role_arn = var.hosted_control_plane ? "${local.role_prefix}-HCP-ROSA-Installer-Role" : "${local.role_prefix}-Installer-Role"
   support_role_arn   = var.hosted_control_plane ? "${local.role_prefix}-HCP-ROSA-Support-Role" : "${local.role_prefix}-Support-Role"
-  master_role_arn    = var.hosted_control_plane ? null : "${local.role_prefix}-Support-Role"
-  worker_role_arn    = var.hosted_control_plane ? "${local.role_prefix}-HCP-ROSA-Worker-Role" : "${local.role_prefix}-Worker-Role"
-  oidc_config_id     = var.hosted_control_plane ? module.oidc_config_and_provider[0].oidc_config_id : null
-  oidc_endpoint_url  = var.hosted_control_plane ? module.oidc_config_and_provider[0].oidc_endpoint_url : null
+
+  # instance roles
+  master_role_arn = var.hosted_control_plane ? null : "${local.role_prefix}-Support-Role"
+  worker_role_arn = var.hosted_control_plane ? "${local.role_prefix}-HCP-ROSA-Worker-Role" : "${local.role_prefix}-Worker-Role"
+
+  # oidc config
+  oidc_config_id    = var.hosted_control_plane ? module.oidc_config_and_provider[0].oidc_config_id : null
+  oidc_endpoint_url = var.hosted_control_plane ? module.oidc_config_and_provider[0].oidc_endpoint_url : null
 
   # sts roles
   sts_roles = {
