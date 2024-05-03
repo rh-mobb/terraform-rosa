@@ -29,3 +29,11 @@ resource "rhcs_identity_provider" "developer" {
 
   depends_on = [rhcs_cluster_wait.rosa]
 }
+
+resource "rhcs_group_membership" "admin" {
+  user    = "admin"
+  group   = "cluster-admins"
+  cluster = local.cluster_id
+
+  depends_on = [rhcs_identity_provider.admin]
+}
