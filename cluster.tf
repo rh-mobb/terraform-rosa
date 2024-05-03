@@ -81,7 +81,7 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   wait_for_create_complete            = true
   wait_for_std_compute_nodes_complete = true
 
-  depends_on = [module.network, module.account_roles_hcp]
+  depends_on = [module.network, module.account_roles_hcp, module.operator_roles_hcp]
 }
 
 locals {
