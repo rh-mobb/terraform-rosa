@@ -25,3 +25,11 @@ output "oidc_config_id" {
 output "oidc_endpoint_url" {
   value = local.cluster_oidc_endpoint_url
 }
+
+output "cluster_api_url" {
+  value = local.cluster_api_url
+}
+
+output "cluster_console_url" {
+  value = local.cluster_console_url
+}
