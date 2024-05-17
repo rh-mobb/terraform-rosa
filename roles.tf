@@ -97,7 +97,7 @@ locals {
   support_role_arn   = var.hosted_control_plane ? "${local.role_prefix}-HCP-ROSA-Support-Role" : "${local.role_prefix}-Support-Role"
 
   # instance roles
-  master_role_arn = var.hosted_control_plane ? null : "${local.role_prefix}-Support-Role"
+  master_role_arn = var.hosted_control_plane ? null : "${local.role_prefix}-ControlPlane-Role"
   worker_role_arn = var.hosted_control_plane ? "${local.role_prefix}-HCP-ROSA-Worker-Role" : "${local.role_prefix}-Worker-Role"
 
   # oidc config
