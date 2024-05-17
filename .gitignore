@@ -3,6 +3,7 @@
 **/*.terraform
 **/*.terraform.lock.hcl
 .terraform
+**/*.plan
 .tfstate
 .tfstate.backup
 main.plan

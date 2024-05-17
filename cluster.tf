@@ -89,6 +89,8 @@ locals {
   cluster_name              = var.hosted_control_plane ? rhcs_cluster_rosa_hcp.rosa[0].name : rhcs_cluster_rosa_classic.rosa[0].name
   cluster_oidc_config_id    = var.hosted_control_plane ? rhcs_cluster_rosa_hcp.rosa[0].sts.oidc_config_id : rhcs_cluster_rosa_classic.rosa[0].sts.oidc_endpoint_url
   cluster_oidc_endpoint_url = var.hosted_control_plane ? rhcs_cluster_rosa_hcp.rosa[0].sts.oidc_config_id : rhcs_cluster_rosa_classic.rosa[0].sts.oidc_endpoint_url
+  cluster_api_url           = var.hosted_control_plane ? rhcs_cluster_rosa_hcp.rosa[0].api_url : rhcs_cluster_rosa_classic.rosa[0].api_url
+  cluster_console_url       = var.hosted_control_plane ? rhcs_cluster_rosa_hcp.rosa[0].console_url : rhcs_cluster_rosa_classic.rosa[0].console_url
 }
 
 resource "rhcs_cluster_wait" "rosa" {
