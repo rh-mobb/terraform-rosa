@@ -1,13 +1,6 @@
 #
 # iam account roles
 #
-locals {
-  openshift_major_version = join(".", slice(split(".", var.ocp_version), 0, 2))
-}
-
-#
-# iam account roles
-#
 
 # classic
 module "account_roles_classic" {
