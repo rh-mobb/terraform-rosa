@@ -1,5 +1,5 @@
 variable "cluster_name" {
-  default = "dscott-hcp"
+  default = "dscott-classic"
 }
 
 variable "ocp_version" {
@@ -25,7 +25,7 @@ variable "developer_password" {
 module "rosa_public" {
   source = "../"
 
-  hosted_control_plane = true
+  hosted_control_plane = false
   private              = false
   multi_az             = var.multi_az
   autoscaling          = true

@@ -5,32 +5,20 @@ locals {
   openshift_major_version = join(".", slice(split(".", var.ocp_version), 0, 2))
 }
 
-data "rhcs_policies" "all_policies" {}
-
-data "rhcs_versions" "all" {}
-
 #
 # iam account roles
 #
 
 # classic
-module "account_roles" {
+module "account_roles_classic" {
   count = var.hosted_control_plane ? 0 : 1
 
-  source  = "terraform-redhat/rosa-sts/aws"
-  version = "0.0.15"
+  source  = "terraform-redhat/rosa-classic/rhcs//modules/account-iam-resources"
+  version = "1.6.2-prerelease.1"
 
-  create_operator_roles = false
-  create_oidc_provider  = false
-  create_account_roles  = true
-
-  account_role_prefix    = var.cluster_name
-  ocm_environment        = "production"
-  rosa_openshift_version = local.openshift_major_version
-  account_role_policies  = data.rhcs_policies.all_policies.account_role_policies
-  operator_role_policies = data.rhcs_policies.all_policies.operator_role_policies
-  all_versions           = data.rhcs_versions.all
-  tags                   = var.tags
+  account_role_prefix = var.cluster_name
+  openshift_version   = var.ocp_version
+  tags                = var.tags
 }
 
 # hosted control plane
@@ -38,7 +26,7 @@ module "account_roles_hcp" {
   count = var.hosted_control_plane ? 1 : 0
 
   source  = "terraform-redhat/rosa-hcp/rhcs//modules/account-iam-resources"
-  version = "1.6.1-prerelease.2"
+  version = "1.6.2-prerelease.1"
 
   account_role_prefix = var.cluster_name
   tags                = var.tags
@@ -49,36 +37,45 @@ module "account_roles_hcp" {
 #
 
 # classic
-data "rhcs_rosa_operator_roles" "operator_roles" {
+module "oidc_config_and_provider_classic" {
   count = var.hosted_control_plane ? 0 : 1
 
-  operator_role_prefix = local.cluster_name
-  account_role_prefix  = local.cluster_name
+  source  = "terraform-redhat/rosa-classic/rhcs//modules/oidc-config-and-provider"
+  version = "1.6.2-prerelease.1"
+
+  managed = true
+  tags    = var.tags
 }
 
-module "operator_roles" {
+module "operator_policies_classic" {
   count = var.hosted_control_plane ? 0 : 1
 
-  source  = "terraform-redhat/rosa-sts/aws"
-  version = "0.0.15"
+  source  = "terraform-redhat/rosa-classic/rhcs//modules/operator-policies"
+  version = "1.6.2-prerelease.1"
 
-  create_operator_roles = true
-  create_oidc_provider  = true
-  create_account_roles  = false
+  account_role_prefix = var.cluster_name
+  openshift_version   = var.ocp_version
+  tags                = var.tags
+}
 
-  cluster_id                  = local.cluster_id
-  rh_oidc_provider_thumbprint = rhcs_cluster_rosa_classic.rosa[0].sts.thumbprint
-  rh_oidc_provider_url        = rhcs_cluster_rosa_classic.rosa[0].sts.oidc_endpoint_url
-  operator_roles_properties   = data.rhcs_rosa_operator_roles.operator_roles[0].operator_iam_roles
-  tags                        = var.tags
+module "operator_roles_classic" {
+  count = var.hosted_control_plane ? 0 : 1
+
+  source  = "terraform-redhat/rosa-classic/rhcs//modules/operator-roles"
+  version = "1.6.2-prerelease.1"
+
+  operator_role_prefix = var.cluster_name
+  account_role_prefix  = module.operator_policies_classic[0].account_role_prefix
+  oidc_endpoint_url    = module.oidc_config_and_provider_classic[0].oidc_endpoint_url
+  tags                 = var.tags
 }
 
 # hosted control plane
-module "oidc_config_and_provider" {
+module "oidc_config_and_provider_hcp" {
   count = var.hosted_control_plane ? 1 : 0
 
   source  = "terraform-redhat/rosa-hcp/rhcs//modules/oidc-config-and-provider"
-  version = "1.6.1-prerelease.2"
+  version = "1.6.2-prerelease.1"
 
   managed = true
   tags    = var.tags
@@ -88,9 +85,9 @@ module "operator_roles_hcp" {
   count = var.hosted_control_plane ? 1 : 0
 
   source  = "terraform-redhat/rosa-hcp/rhcs//modules/operator-roles"
-  version = "1.6.1-prerelease.2"
+  version = "1.6.2-prerelease.1"
 
-  oidc_endpoint_url    = module.oidc_config_and_provider[0].oidc_endpoint_url
+  oidc_endpoint_url    = module.oidc_config_and_provider_hcp[0].oidc_endpoint_url
   operator_role_prefix = var.cluster_name
   tags                 = var.tags
 }
@@ -111,8 +108,8 @@ locals {
   worker_role_arn = var.hosted_control_plane ? "${local.role_prefix}-HCP-ROSA-Worker-Role" : "${local.role_prefix}-Worker-Role"
 
   # oidc config
-  oidc_config_id    = var.hosted_control_plane ? module.oidc_config_and_provider[0].oidc_config_id : null
-  oidc_endpoint_url = var.hosted_control_plane ? module.oidc_config_and_provider[0].oidc_endpoint_url : null
+  oidc_config_id    = var.hosted_control_plane ? module.oidc_config_and_provider_hcp[0].oidc_config_id : module.oidc_config_and_provider_classic[0].oidc_config_id
+  oidc_endpoint_url = var.hosted_control_plane ? module.oidc_config_and_provider_hcp[0].oidc_endpoint_url : module.oidc_config_and_provider_classic[0].oidc_endpoint_url
 
   # sts roles
   sts_roles = {

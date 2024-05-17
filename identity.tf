@@ -10,8 +10,6 @@ resource "rhcs_identity_provider" "admin" {
       },
     ]
   }
-
-  depends_on = [rhcs_cluster_wait.rosa]
 }
 
 resource "rhcs_identity_provider" "developer" {
@@ -26,8 +24,6 @@ resource "rhcs_identity_provider" "developer" {
       },
     ]
   }
-
-  depends_on = [rhcs_cluster_wait.rosa]
 }
 
 resource "rhcs_group_membership" "admin" {
