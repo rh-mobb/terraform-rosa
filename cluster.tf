@@ -47,8 +47,9 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   sts        = local.sts_roles
 
   disable_waiting_in_destroy = false
+  wait_for_create_complete   = true
 
-  depends_on = [module.network, module.account_roles]
+  depends_on = [module.network, module.account_roles_classic, module.operator_roles_classic]
 }
 
 # hosted control plane
@@ -61,8 +62,7 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   cloud_region           = var.region
   aws_account_id         = data.aws_caller_identity.current.account_id
   aws_billing_account_id = data.aws_caller_identity.current.account_id
-
-  tags = var.tags
+  tags                   = var.tags
 
   # network
   private            = var.private
@@ -91,13 +91,4 @@ locals {
   cluster_oidc_endpoint_url = var.hosted_control_plane ? rhcs_cluster_rosa_hcp.rosa[0].sts.oidc_config_id : rhcs_cluster_rosa_classic.rosa[0].sts.oidc_endpoint_url
   cluster_api_url           = var.hosted_control_plane ? rhcs_cluster_rosa_hcp.rosa[0].api_url : rhcs_cluster_rosa_classic.rosa[0].api_url
   cluster_console_url       = var.hosted_control_plane ? rhcs_cluster_rosa_hcp.rosa[0].console_url : rhcs_cluster_rosa_classic.rosa[0].console_url
-}
-
-resource "rhcs_cluster_wait" "rosa" {
-  count = var.hosted_control_plane ? 0 : 1
-
-  cluster = local.cluster_id
-  timeout = 60
-
-  depends_on = [module.operator_roles]
 }
