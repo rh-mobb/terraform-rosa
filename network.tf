@@ -1,5 +1,5 @@
 module "network" {
-  source = "git::https://github.com/scottd018-demos/terraform-rosa-networking.git?ref=v0.0.6"
+  source = "./modules/terraform-rosa-networking"
 
   cluster_name = var.cluster_name
 
