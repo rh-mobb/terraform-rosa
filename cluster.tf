@@ -77,6 +77,11 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   version    = var.ocp_version
   sts        = local.sts_roles
 
+  # replicas
+  replicas           = var.multi_az ? 3 : 2
+
+
+
   disable_waiting_in_destroy          = false
   wait_for_create_complete            = true
   wait_for_std_compute_nodes_complete = true
