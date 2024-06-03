@@ -35,12 +35,5 @@ variable "network" {
 variable "tags" {
   description = "Tags applied to all objects"
   type        = map(string)
-  default = {
-    "owner" = "dscott"
-  }
-
-  validation {
-    condition     = (var.tags["owner"] != null && var.tags["owner"] != "")
-    error_message = "Please specify the 'owner' tag as part of 'var.tags'."
-  }
+  default     = {}
 }
