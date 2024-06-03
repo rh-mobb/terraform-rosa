@@ -66,13 +66,21 @@ variable "tags" {
 }
 
 variable "admin_password" {
-  description = "Password for the 'admin' user. IDP is not created if unspecified."
+  description = <<EOF
+  Password for the 'developer' user. IDP is not created if unspecified.
+
+  Password must be 14 characters or more, contain one uppercase letter and a symbol or number.
+  EOF
   type        = string
   sensitive   = true
 }
 
 variable "developer_password" {
-  description = "Password for the 'developer' user. IDP is not created if unspecified."
+  description = <<EOF
+  Password for the 'developer' user. IDP is not created if unspecified.
+  
+  Password must be 14 characters or more, contain one uppercase letter and a symbol or number.
+  EOF
   type        = string
   sensitive   = true
 }
