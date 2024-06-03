@@ -60,9 +60,7 @@ variable "service_cidr" {
 variable "tags" {
   description = "Tags applied to all objects"
   type        = map(string)
-  default = {
-    "owner" = "dscott"
-  }
+  default     = {}
 }
 
 variable "admin_password" {

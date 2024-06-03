@@ -1,3 +1,7 @@
+locals {
+  bastion_tags = merge(var.tags, { "Name" = "${var.cluster_name}-bastion" })
+}
+
 data "aws_ami" "rhel9" {
   count = var.private ? 1 : 0
 
@@ -32,11 +36,7 @@ resource "aws_key_pair" "bastion_host" {
   key_name   = "${var.cluster_name}-bastion"
   public_key = file(var.bastion_public_ssh_key)
 
-  tags = merge(var.tags,
-    {
-      "Name" = "${var.cluster_name}-bastion"
-    }
-  )
+  tags = local.bastion_tags
 }
 
 resource "aws_security_group" "bastion_host" {
@@ -63,11 +63,7 @@ resource "aws_security_group" "bastion_host" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(var.tags,
-    {
-      "Name" = "${var.cluster_name}-bastion"
-    }
-  )
+  tags = local.bastion_tags
 }
 
 resource "aws_instance" "bastion_host" {
@@ -79,11 +75,7 @@ resource "aws_instance" "bastion_host" {
   key_name               = aws_key_pair.bastion_host[0].key_name
   vpc_security_group_ids = [aws_security_group.bastion_host[0].id]
 
-  tags = merge(var.tags,
-    {
-      "Name" = "${var.cluster_name}-bastion"
-    }
-  )
+  tags = local.bastion_tags
 
   user_data = <<EOF
 #!/bin/bash
