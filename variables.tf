@@ -36,11 +36,6 @@ variable "replicas" {
   description = "Number of replicas for the default machine pool, this is ignored if autoscaling is enabled"
 }
 
-variable "rosa_prevent_destroy" {
-  type    = bool
-  default = false
-}
-
 variable "token" {
   type      = string
   sensitive = true

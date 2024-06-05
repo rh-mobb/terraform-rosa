@@ -51,9 +51,7 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   wait_for_create_complete   = true
 
   depends_on = [module.network, module.account_roles_classic, module.operator_roles_classic]
-  lifecycle {
-    prevent_destroy = var.rosa_prevent_destroy
-  }
+
 }
 
 # hosted control plane
@@ -91,9 +89,7 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   wait_for_std_compute_nodes_complete = true
 
   depends_on = [module.network, module.account_roles_hcp, module.operator_roles_hcp]
-  lifecycle {
-    prevent_destroy = var.rosa_prevent_destroy
-  }
+
 }
 
 locals {
