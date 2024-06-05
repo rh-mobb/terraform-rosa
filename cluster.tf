@@ -4,8 +4,9 @@ data "aws_region" "current" {}
 
 locals {
   # autoscaling
-  autoscaling_min = var.multi_az ? 3 : 2
-  autoscaling_max = var.multi_az ? 6 : 4
+  autoscaling_min  = var.multi_az ? 3 : 2
+  autoscaling_max  = var.multi_az ? 6 : 4
+  default_replicas = var.multi_az ? 3 : 2
 }
 
 #
@@ -30,6 +31,7 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   autoscaling_enabled = var.autoscaling
   min_replicas        = var.autoscaling ? local.autoscaling_min : null
   max_replicas        = var.autoscaling ? local.autoscaling_max : null
+  replicas            = var.autoscaling ? null : coalesce(var.replicas, local.default_replicas)
 
   # network
   private            = var.private
@@ -78,15 +80,14 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   sts        = local.sts_roles
 
   # replicas
-  replicas           = var.multi_az ? 3 : 2
-
-
+  replicas = coalesce(var.replicas, local.default_replicas)
 
   disable_waiting_in_destroy          = false
   wait_for_create_complete            = true
   wait_for_std_compute_nodes_complete = true
 
   depends_on = [module.network, module.account_roles_hcp, module.operator_roles_hcp]
+
 }
 
 locals {

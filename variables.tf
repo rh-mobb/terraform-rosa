@@ -8,6 +8,11 @@ variable "bastion_public_ssh_key" {
   default = "~/.ssh/id_rsa.pub"
 }
 
+variable "region" {
+  type    = string
+  default = "us-east-1"
+}
+
 variable "multi_az" {
   type    = bool
   default = false
@@ -21,6 +26,14 @@ variable "hosted_control_plane" {
 variable "autoscaling" {
   type    = bool
   default = true
+  description = "Enable autoscaling for the default machine pool, this is ignored for HCP clusters"
+}
+
+variable "replicas" {
+  type = number
+  nullable = true
+  default = null
+  description = "Number of replicas for the default machine pool, this is ignored if autoscaling is enabled"
 }
 
 variable "token" {
@@ -76,14 +89,9 @@ variable "admin_password" {
 variable "developer_password" {
   description = <<EOF
   Password for the 'developer' user. IDP is not created if unspecified.
-  
+
   Password must be 14 characters or more, contain one uppercase letter and a symbol or number.
   EOF
   type        = string
   sensitive   = true
-}
-
-variable "region" {
-  type    = string
-  default = "us-east-1"
 }
