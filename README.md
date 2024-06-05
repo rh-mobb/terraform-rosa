@@ -1,0 +1,64 @@
+# Summary
+
+This repository can be used as a module to create a ROSA cluster with the following components:
+
+- ROSA networking in either private/public architecture
+- ROSA cluster in either "Classic" or "Hosted Control Plane" architecture
+- Machine Pool with desired replica count
+- Local HTPasswd identity provider with an "admin" user with Cluster Admin privileges
+- Local HTPasswd identity provider with an "developer" user with basic privileges
+
+
+# Usage
+
+The following Terraform is an example file to deploy a public ROSA cluster via this module.  This file
+can be created in wherever you want to run Terraform at as a `main.tf` file.  A complete list of variables
+and modifications is available via the [variables.tf](variables.tf) file:
+
+**NOTE:** this is an overly simplistic file to demonstrate a simple installation.  You will need to tailor your 
+automation to your needs.  If there is functionality that is missing that you would like to see, please open an issue!
+
+```
+variable "token" {
+  type      = string
+  sensitive = true
+}
+
+variable "admin_password" {
+  type      = string
+  sensitive = true
+}
+
+variable "developer_password" {
+  type      = string
+  sensitive = true
+}
+
+module "rosa_public" {
+  source = "git::https://github.com/rh-mobb/terraform-rosa.git?ref=v0.0.1?ref=main"
+
+  hosted_control_plane = false
+  private              = false
+  multi_az             = false
+  autoscaling          = false
+  cluster_name         = "my-rosa-cluster"
+  ocp_version          = "4.15.14"
+  token                = var.token
+  admin_password       = var.admin_password
+  developer_password   = var.developer_password
+  pod_cidr             = "10.128.0.0/14"
+  service_cidr         = "172.30.0.0/16"
+
+  tags = {
+    "owner" = "me"
+  }
+}
+```
+
+Once the above has been created, normal Terraform commands can be run:
+
+```bash
+terraform init
+terraform plan rosa.out
+terraform apply rosa.out
+```
