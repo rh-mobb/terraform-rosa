@@ -88,14 +88,11 @@ sudo dnf install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/late
 sudo systemctl enable amazon-ssm-agent
 sudo systemctl start amazon-ssm-agent
 
-# mitmproxy
-
+# openshift/kubernetes clients
 wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
-
 mkdir openshift
 tar -zxvf openshift-client-linux.tar.gz -C openshift
 sudo install openshift/oc /usr/local/bin/oc
 sudo install openshift/kubectl /usr/local/bin/kubectl
 EOF
-
 }
