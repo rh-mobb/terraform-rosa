@@ -31,7 +31,8 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   autoscaling_enabled = var.autoscaling
   min_replicas        = var.autoscaling ? local.autoscaling_min : null
   max_replicas        = var.autoscaling ? local.autoscaling_max : null
-  replicas           = var.autoscaling ? null : coalesce(var.replicas, local.default_replicas)
+  replicas            = var.autoscaling ? null : coalesce(var.replicas, local.default_replicas)
+
   # network
   private            = var.private
   aws_private_link   = var.private
