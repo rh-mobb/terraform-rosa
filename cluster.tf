@@ -6,6 +6,7 @@ locals {
   # autoscaling
   autoscaling_min = var.multi_az ? 3 : 2
   autoscaling_max = var.multi_az ? 6 : 4
+  default_replicas = var.multi_az ? 3 : 2
 }
 
 #
@@ -30,7 +31,7 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   autoscaling_enabled = var.autoscaling
   min_replicas        = var.autoscaling ? local.autoscaling_min : null
   max_replicas        = var.autoscaling ? local.autoscaling_max : null
-
+  replicas           = var.autoscaling ? null : coalesce(var.replicas, local.default_replicas)
   # network
   private            = var.private
   aws_private_link   = var.private
@@ -50,6 +51,9 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   wait_for_create_complete   = true
 
   depends_on = [module.network, module.account_roles_classic, module.operator_roles_classic]
+  lifecycle {
+    prevent_destroy = var.rosa_prevent_destroy
+  }
 }
 
 # hosted control plane
@@ -78,7 +82,7 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   sts        = local.sts_roles
 
   # replicas
-  replicas           = var.multi_az ? 3 : 2
+  replicas = coalesce(var.replicas, local.default_replicas)
 
 
 
@@ -87,6 +91,9 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   wait_for_std_compute_nodes_complete = true
 
   depends_on = [module.network, module.account_roles_hcp, module.operator_roles_hcp]
+  lifecycle {
+    prevent_destroy = var.rosa_prevent_destroy
+  }
 }
 
 locals {
