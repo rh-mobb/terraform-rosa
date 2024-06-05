@@ -95,4 +95,3 @@ variable "developer_password" {
   type        = string
   sensitive   = true
 }
-
