@@ -52,7 +52,6 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   wait_for_create_complete   = true
 
   depends_on = [module.network, module.account_roles_classic, module.operator_roles_classic]
-
 }
 
 # hosted control plane
@@ -82,8 +81,6 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
 
   # replicas
   replicas = coalesce(var.replicas, local.default_replicas)
-
-
 
   disable_waiting_in_destroy          = false
   wait_for_create_complete            = true
