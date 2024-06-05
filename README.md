@@ -3,10 +3,11 @@
 This repository can be used as a module to create a ROSA cluster with the following components:
 
 - ROSA networking in either private/public architecture
-- ROSA cluster in either "Classic" or "Hosted Control Plane" architecture
-- Machine Pool with desired replica count
-- Local HTPasswd identity provider with an "admin" user with Cluster Admin privileges
-- Local HTPasswd identity provider with an "developer" user with basic privileges
+- ROSA cluster in either [Classic](https://docs.openshift.com/rosa/architecture/rosa-architecture-models.html#rosa-classic-architecture_rosa-architecture-models) 
+or [Hosted Control Plane](https://docs.openshift.com/rosa/architecture/rosa-architecture-models.html#rosa-hcp-architecture_rosa-architecture-models) architecture
+- [Default machine pool](https://docs.openshift.com/rosa/rosa_cluster_admin/rosa_nodes/rosa-nodes-machinepools-about.html) with desired replica count
+- Local HTPasswd [identity provider](https://docs.openshift.com/rosa/authentication/sd-configuring-identity-providers.html) with an "admin" user with Cluster Admin privileges
+- Local HTPasswd [identity provider](https://docs.openshift.com/rosa/authentication/sd-configuring-identity-providers.html) with an "developer" user with basic privileges
 
 
 # Usage
