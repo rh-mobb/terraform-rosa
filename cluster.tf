@@ -4,8 +4,8 @@ data "aws_region" "current" {}
 
 locals {
   # autoscaling
-  autoscaling_min = var.multi_az ? 3 : 2
-  autoscaling_max = var.multi_az ? 6 : 4
+  autoscaling_min  = var.multi_az ? 3 : 2
+  autoscaling_max  = var.multi_az ? 6 : 4
   default_replicas = var.multi_az ? 3 : 2
 }
 
