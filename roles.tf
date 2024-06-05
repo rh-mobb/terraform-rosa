@@ -87,7 +87,7 @@ module "operator_roles_hcp" {
 
 #
 # sts role block
-#   NOTE: this is the sts role black that is passed into the cluster creation process
+#   NOTE: this is the sts role block that is passed into the cluster creation process
 #
 locals {
   role_prefix = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.cluster_name}"
