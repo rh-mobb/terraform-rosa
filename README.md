@@ -13,7 +13,7 @@ or [Hosted Control Plane](https://docs.openshift.com/rosa/architecture/rosa-arch
 # Usage
 
 The following Terraform is an example file to deploy a public ROSA cluster via this module.  This file
-can be created in wherever you want to run Terraform at as a `main.tf` file.  A complete list of variables
+can be created wherever you would like to run Terraform from as a `main.tf` file.  A complete list of variables
 and modifications is available via the [variables.tf](variables.tf) file:
 
 **NOTE:** this is an overly simplistic file to demonstrate a simple installation.  You will need to tailor your 
@@ -36,7 +36,7 @@ variable "developer_password" {
 }
 
 module "rosa_public" {
-  source = "git::https://github.com/rh-mobb/terraform-rosa.git?ref=v0.0.1?ref=main"
+  source = "git::https://github.com/rh-mobb/terraform-rosa.git?ref=main"
 
   hosted_control_plane = false
   private              = false
