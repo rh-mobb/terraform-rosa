@@ -63,3 +63,7 @@ terraform init
 terraform plan rosa.out
 terraform apply rosa.out
 ```
+
+## Instance Types
+
+If you require your cluster to use a different instance type than the default m5.2xlarge, there is a `compute_machine_type` variable that can be implemented in the same fashion as those above
