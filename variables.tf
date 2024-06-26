@@ -99,6 +99,6 @@ variable "developer_password" {
 variable "compute_machine_type" {
   description = "The machine type used by the initial worker nodes, for example, m5.xlarge."
   type        = string
-  default     = "m5.xlarge" # or any other default value you prefer
+  default     = "m5.xlarge"
 }
 
