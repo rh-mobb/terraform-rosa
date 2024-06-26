@@ -43,6 +43,9 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   pod_cidr           = var.pod_cidr
   service_cidr       = var.service_cidr
 
+  # instance type
+  compute_machine_type = var.compute_machine_type
+
   # rosa / openshift
   properties = { rosa_creator_arn = data.aws_caller_identity.current.arn }
   version    = var.ocp_version
@@ -78,6 +81,9 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   properties = { rosa_creator_arn = data.aws_caller_identity.current.arn }
   version    = var.ocp_version
   sts        = local.sts_roles
+
+  # instance type
+  compute_machine_type = var.compute_machine_type
 
   # replicas
   replicas = coalesce(var.replicas, local.default_replicas)
