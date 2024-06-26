@@ -49,6 +49,7 @@ module "rosa_public" {
   developer_password   = var.developer_password
   pod_cidr             = "10.128.0.0/14"
   service_cidr         = "172.30.0.0/16"
+  compute_machine_type = "m5.xlarge"
 
   tags = {
     "owner" = "me"
