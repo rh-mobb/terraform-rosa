@@ -50,6 +50,10 @@ module "rosa_public" {
   pod_cidr             = "10.128.0.0/14"
   service_cidr         = "172.30.0.0/16"
 
+variable "compute_instance_types" {
+  type = string 
+}
+
   tags = {
     "owner" = "me"
   }
@@ -63,7 +67,3 @@ terraform init
 terraform plan rosa.out
 terraform apply rosa.out
 ```
-
-## Instance Types
-
-If you require your cluster to use a different instance type than the default m5.2xlarge, there is a `compute_machine_type` variable that can be implemented in the same fashion as those above
