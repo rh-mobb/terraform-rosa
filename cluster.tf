@@ -27,11 +27,12 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   aws_account_id = data.aws_caller_identity.current.account_id
   tags           = var.tags
 
-  # autoscaling
-  autoscaling_enabled = var.autoscaling
-  min_replicas        = var.autoscaling ? local.autoscaling_min : null
-  max_replicas        = var.autoscaling ? local.autoscaling_max : null
-  replicas            = var.autoscaling ? null : coalesce(var.replicas, local.default_replicas)
+  # autoscaling and instance settings
+  compute_machine_type = var.compute_machine_type
+  autoscaling_enabled  = var.autoscaling
+  min_replicas         = var.autoscaling ? local.autoscaling_min : null
+  max_replicas         = var.autoscaling ? local.autoscaling_max : null
+  replicas             = var.autoscaling ? null : coalesce(var.replicas, local.default_replicas)
 
   # network
   private            = var.private
@@ -42,9 +43,6 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   multi_az           = var.multi_az
   pod_cidr           = var.pod_cidr
   service_cidr       = var.service_cidr
-
-  # instance type
-  compute_machine_type = var.compute_machine_type
 
   # rosa / openshift
   properties = { rosa_creator_arn = data.aws_caller_identity.current.arn }
@@ -69,6 +67,10 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   aws_billing_account_id = data.aws_caller_identity.current.account_id
   tags                   = var.tags
 
+  # autoscaling and instance settings
+  compute_machine_type = var.compute_machine_type
+  replicas             = coalesce(var.replicas, local.default_replicas)
+
   # network
   private            = var.private
   aws_subnet_ids     = local.subnet_ids
@@ -82,18 +84,11 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   version    = var.ocp_version
   sts        = local.sts_roles
 
-  # instance type
-  compute_machine_type = var.compute_machine_type
-
-  # replicas
-  replicas = coalesce(var.replicas, local.default_replicas)
-
   disable_waiting_in_destroy          = false
   wait_for_create_complete            = true
   wait_for_std_compute_nodes_complete = true
 
   depends_on = [module.network, module.account_roles_hcp, module.operator_roles_hcp]
-
 }
 
 locals {
