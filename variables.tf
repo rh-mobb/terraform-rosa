@@ -1,86 +1,134 @@
 variable "private" {
-  type    = bool
-  default = false
+  description = "Set to true to provision a private cluster, which restricts access from the public internet."
+  type        = bool
+  default     = false
 }
 
 variable "bastion_public_ssh_key" {
-  type    = string
-  default = "~/.ssh/id_rsa.pub"
+  description = <<EOF
+  Location to an SSH public key file on the local system which is used to provide connectivity to the bastion host
+  when the 'private' variable is set to 'true'.
+  EOF
+  type        = string
+  default     = "~/.ssh/id_rsa.pub"
 }
 
 variable "region" {
-  type    = string
-  default = "us-east-1"
+  description = "The AWS region to provision a ROSA cluster and required components into."
+  type        = string
+  default     = "us-east-1"
 }
 
 variable "multi_az" {
-  type    = bool
-  default = false
+  description = <<EOF
+  Configure the cluster to use a highly available, multi availability zone configuration.  It should be noted that use
+  of the 'multi_az' variable may affect minimum requirements for 'replicas' and may restrict regions that do not have 
+  three availability zones.
+  EOF
+  type        = bool
+  default     = false
 }
 
 variable "hosted_control_plane" {
-  type    = bool
-  default = false
+  description = "Provision a ROSA cluster using a Hosted Control Plane."
+  type        = bool
+  default     = false
 }
 
 variable "autoscaling" {
+  description = <<EOF
+  Enable autoscaling for the default machine pool, this is ignored for HCP clusters as autoscaling is not supported
+  for Hosted Control Plane clusters at this time.
+
+  WARN: this variable is deprecated.  Simply setting 'max_replicas' will enable autoscaling.  This will be removed 
+  in a future version of this module.
+  EOF
   type        = bool
-  default     = true
-  description = "Enable autoscaling for the default machine pool, this is ignored for HCP clusters"
+  nullable    = true
+  default     = null
 }
 
 variable "replicas" {
+  description = <<EOF
+  Minimum number of replicas for the default machine pool.  If unset, a default value is configured based on the 
+  'multi_az' value.
+  EOF
   type        = number
   nullable    = true
   default     = null
-  description = "Number of replicas for the default machine pool, this is ignored if autoscaling is enabled"
+}
+
+variable "max_replicas" {
+  description = <<EOF
+  Maximum number of replicas for the default machine pool.  If set, autoscaling is enabled for classic clusters.  
+  Autoscaling is unsupported via Terraform for HCP clusters, so this value is always ignored when 'hosted_control_plane'
+  is set to 'true'.  This value must be equal to or higher than the 'replicas' value if set.
+  EOF
+  type        = number
+  nullable    = true
+  default     = null
 }
 
 variable "token" {
-  type      = string
-  sensitive = true
+  description = <<EOF
+  OCM token used to authenticate against the OpenShift Cluster Manager API.  See
+  https://console.redhat.com/openshift/token/rosa/show to access your token.
+  EOF
+  type        = string
+  sensitive   = true
 }
 
 variable "cluster_name" {
-  type = string
+  description = "The name of the cluster.  This is also used as a prefix to name related components."
+  type        = string
 }
 
 variable "ocp_version" {
-  type    = string
-  default = "4.14.7"
+  description = <<EOF
+  The version of OpenShift to use.  You can use the command 'rosa list versions' to see all available OpenShift 
+  versions available to ROSA.
+  EOF
+  type        = string
+  default     = "4.15.18"
 }
 
 variable "vpc_cidr" {
-  type    = string
-  default = "10.10.0.0/16"
+  description = "The CIDR of the VPC that will be created."
+  type        = string
+  default     = "10.10.0.0/16"
 }
 
 variable "subnet_cidr_size" {
-  type    = number
-  default = 20
+  description = <<EOF
+  The CIDR size of each of the individual subnets that will be created.  Must be within range of the 'vpc_cidr' 
+  variable.
+  EOF
+  type        = number
+  default     = 20
 }
 
 variable "pod_cidr" {
-  type    = string
-  default = "10.128.0.0/14"
+  description = "The internal pod CIDR network used for assigning IP addresses to pods."
+  type        = string
+  default     = "10.128.0.0/14"
 }
 
 variable "service_cidr" {
-  type    = string
-  default = "172.30.0.0/16"
+  description = "The internal service CIDR network used for assigning IP addresses to services."
+  type        = string
+  default     = "172.30.0.0/16"
 }
 
 variable "tags" {
-  description = "Tags applied to all objects"
+  description = "Tags applied to all objects."
   type        = map(string)
   default     = {}
 }
 
 variable "admin_password" {
   description = <<EOF
-  Password for the 'admin' user. IDP is not created if unspecified.
-
-  Password must be 14 characters or more, contain one uppercase letter and a symbol or number.
+  Password for the 'admin' user. IDP is not created if unspecified.  Password must be 14 characters or more, contain 
+  one uppercase letter and a symbol or number.
   EOF
   type        = string
   sensitive   = true
@@ -88,16 +136,18 @@ variable "admin_password" {
 
 variable "developer_password" {
   description = <<EOF
-  Password for the 'developer' user. IDP is not created if unspecified.
-
-  Password must be 14 characters or more, contain one uppercase letter and a symbol or number.
+  Password for the 'developer' user. IDP is not created if unspecified.  Password must be 14 characters or more, contain 
+  one uppercase letter and a symbol or number.
   EOF
   type        = string
   sensitive   = true
 }
 
 variable "compute_machine_type" {
-  description = "The machine type used by the initial worker nodes, for example, m5.xlarge."
+  description = <<EOF
+  The machine type used by the initial worker nodes, for example, m5.xlarge.  You can use the command 'rosa list 
+  instance-types' to see all available instance types available to ROSA.
+  EOF
   type        = string
   default     = "m5.xlarge"
 }

@@ -2,18 +2,25 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
-locals {
-  # autoscaling
-  autoscaling_min  = var.multi_az ? 3 : 2
-  autoscaling_max  = var.multi_az ? 6 : 4
-  default_replicas = var.multi_az ? 3 : 2
-}
-
 #
 # cluster
 #
 locals {
+  # networking
   subnet_ids = var.private ? module.network.private_subnet_ids : concat(module.network.private_subnet_ids, module.network.public_subnet_ids)
+
+  # autoscaling
+  autoscaling = var.max_replicas != null
+  replicas    = var.replicas == null ? var.multi_az ? 3 : 2 : var.replicas
+}
+
+resource "validation_warning" "autoscaling_variable_deprecation" {
+  condition = var.autoscaling != null
+  summary   = "The 'autoscaling' variable will be deprecated in a future release.'"
+  details   = <<EOF
+Please use 'replicas' with 'max_replicas' to enable autoscaling for ROSA Classic clusters.  Setting 'max_replicas'
+will enable the autoscaling feature.
+EOF
 }
 
 # classic
@@ -27,11 +34,12 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   aws_account_id = data.aws_caller_identity.current.account_id
   tags           = var.tags
 
-  # autoscaling
-  autoscaling_enabled = var.autoscaling
-  min_replicas        = var.autoscaling ? local.autoscaling_min : null
-  max_replicas        = var.autoscaling ? local.autoscaling_max : null
-  replicas            = var.autoscaling ? null : coalesce(var.replicas, local.default_replicas)
+  # autoscaling and instance settings
+  compute_machine_type = var.compute_machine_type
+  autoscaling_enabled  = local.autoscaling
+  min_replicas         = local.autoscaling ? local.replicas : null
+  max_replicas         = local.autoscaling ? var.max_replicas : null
+  replicas             = local.autoscaling ? null : coalesce(var.replicas, local.replicas)
 
   # network
   private            = var.private
@@ -43,9 +51,6 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   pod_cidr           = var.pod_cidr
   service_cidr       = var.service_cidr
 
-  # instance type
-  compute_machine_type = var.compute_machine_type
-
   # rosa / openshift
   properties = { rosa_creator_arn = data.aws_caller_identity.current.arn }
   version    = var.ocp_version
@@ -55,6 +60,18 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   wait_for_create_complete   = true
 
   depends_on = [module.network, module.account_roles_classic, module.operator_roles_classic]
+
+  lifecycle {
+    precondition {
+      condition     = var.max_replicas != null ? var.max_replicas >= var.replicas : true
+      error_message = "'max_replicas' must be greater than or equal to 'replicas' when set."
+    }
+
+    precondition {
+      condition     = var.multi_az ? var.replicas >= 3 : var.replicas >= 2
+      error_message = "'replicas' must be greater than or equal to 3 when 'multi_az' is set and 2 when it is not set."
+    }
+  }
 }
 
 # hosted control plane
@@ -69,6 +86,10 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   aws_billing_account_id = data.aws_caller_identity.current.account_id
   tags                   = var.tags
 
+  # autoscaling and instance settings
+  compute_machine_type = var.compute_machine_type
+  replicas             = coalesce(var.replicas, local.replicas)
+
   # network
   private            = var.private
   aws_subnet_ids     = local.subnet_ids
@@ -82,18 +103,11 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   version    = var.ocp_version
   sts        = local.sts_roles
 
-  # instance type
-  compute_machine_type = var.compute_machine_type
-
-  # replicas
-  replicas = coalesce(var.replicas, local.default_replicas)
-
   disable_waiting_in_destroy          = false
   wait_for_create_complete            = true
   wait_for_std_compute_nodes_complete = true
 
   depends_on = [module.network, module.account_roles_hcp, module.operator_roles_hcp]
-
 }
 
 locals {
