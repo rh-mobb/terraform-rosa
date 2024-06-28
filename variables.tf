@@ -24,15 +24,15 @@ variable "hosted_control_plane" {
 }
 
 variable "autoscaling" {
-  type    = bool
-  default = true
+  type        = bool
+  default     = true
   description = "Enable autoscaling for the default machine pool, this is ignored for HCP clusters"
 }
 
 variable "replicas" {
-  type = number
-  nullable = true
-  default = null
+  type        = number
+  nullable    = true
+  default     = null
   description = "Number of replicas for the default machine pool, this is ignored if autoscaling is enabled"
 }
 
@@ -101,4 +101,3 @@ variable "compute_machine_type" {
   type        = string
   default     = "m5.xlarge"
 }
-
