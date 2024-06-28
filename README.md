@@ -41,7 +41,8 @@ module "rosa_public" {
   hosted_control_plane = false
   private              = false
   multi_az             = false
-  autoscaling          = false
+  replicas             = 2
+  max_replicas         = 4
   cluster_name         = "my-rosa-cluster"
   ocp_version          = "4.15.14"
   token                = var.token
