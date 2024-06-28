@@ -39,13 +39,31 @@ variable "autoscaling" {
   description = <<EOF
   Enable autoscaling for the default machine pool, this is ignored for HCP clusters as autoscaling is not supported
   for Hosted Control Plane clusters at this time.
+
+  WARN: this variable is deprecated.  Simply setting 'max_replicas' will enable autoscaling.  This will be removed 
+  in a future version of this module.
   EOF
   type        = bool
-  default     = true
+  nullable    = true
+  default     = null
 }
 
 variable "replicas" {
-  description = "Number of replicas for the default machine pool, this is ignored if autoscaling is enabled."
+  description = <<EOF
+  Minimum number of replicas for the default machine pool.  If unset, a default value is configured based on the 
+  'multi_az' value.
+  EOF
+  type        = number
+  nullable    = true
+  default     = null
+}
+
+variable "max_replicas" {
+  description = <<EOF
+  Maximum number of replicas for the default machine pool.  If set, autoscaling is enabled for classic clusters.  
+  Autoscaling is unsupported via Terraform for HCP clusters, so this value is always ignored when 'hosted_control_plane'
+  is set to 'true'.  This value must be equal to or higher than the 'replicas' value if set.
+  EOF
   type        = number
   nullable    = true
   default     = null

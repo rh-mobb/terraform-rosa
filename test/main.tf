@@ -7,7 +7,7 @@ variable "ocp_version" {
 }
 
 variable "multi_az" {
-  default = false
+  default = true
 }
 
 variable "token" {
@@ -28,7 +28,8 @@ module "rosa_public" {
   hosted_control_plane = false
   private              = false
   multi_az             = var.multi_az
-  autoscaling          = true
+  replicas             = 3
+  max_replicas         = 3
   cluster_name         = var.cluster_name
   ocp_version          = var.ocp_version
   token                = var.token
@@ -36,6 +37,10 @@ module "rosa_public" {
   developer_password   = var.developer_password
   pod_cidr             = "10.128.0.0/14"
   service_cidr         = "172.30.0.0/16"
+
+  # NOTE: this variable is deprecated.  setting both replicas and max_replicas 
+  #       will enable autoscaling. 
+  # autoscaling = true
 
   tags = {
     "cost-center"   = "CC468"
