@@ -1,8 +1,9 @@
 # Summary
 
-This repository can be used as a module to create a ROSA cluster with the following components:
+This repository is intended to show an example of a starting point for implementing your own ROSA automation.  This 
+example provisions the following:
 
-- ROSA networking in either private/public architecture
+- ROSA networking in either private/public architecture (you may pass your pre-existing subnet IDs if you have a pre-existing network)
 - ROSA cluster in either [Classic](https://docs.openshift.com/rosa/architecture/rosa-architecture-models.html#rosa-classic-architecture_rosa-architecture-models) 
 or [Hosted Control Plane](https://docs.openshift.com/rosa/architecture/rosa-architecture-models.html#rosa-hcp-architecture_rosa-architecture-models) architecture
 - [Default machine pool](https://docs.openshift.com/rosa/rosa_cluster_admin/rosa_nodes/rosa-nodes-machinepools-about.html) with desired replica count
@@ -10,7 +11,16 @@ or [Hosted Control Plane](https://docs.openshift.com/rosa/architecture/rosa-arch
 - Local HTPasswd [identity provider](https://docs.openshift.com/rosa/authentication/sd-configuring-identity-providers.html) with an "developer" user with basic privileges
 
 
-# Usage
+# Usage as Example
+
+This is the desired workflow for consuming this repository.  There are a couple good examples of how to 
+use this in our upstream documentation:
+
+- [Provision a ROSA Classic Cluster with Terraform](https://cloud.redhat.com/experts/rosa/terraform/classic/)
+- [Provision a ROSA Hosted Control Plane Cluster with Terraform](https://cloud.redhat.com/experts/rosa/terraform/hcp/)
+
+
+# Usage as Module
 
 The following Terraform is an example file to deploy a public ROSA cluster via this module.  This file
 can be created wherever you would like to run Terraform from as a `main.tf` file.  A complete list of variables
@@ -18,6 +28,9 @@ and modifications is available via the [variables.tf](variables.tf) file:
 
 **NOTE:** this is an overly simplistic file to demonstrate a simple installation.  You will need to tailor your 
 automation to your needs.  If there is functionality that is missing that you would like to see, please open an issue!
+
+**WARN:** this repository is not tested to the level of many community Terraform modules, although it is versioned.  Please
+consider this when consuming this repository as a Terraform module.
 
 ```
 variable "token" {
