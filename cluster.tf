@@ -7,7 +7,7 @@ data "aws_region" "current" {}
 #
 locals {
   # networking
-  subnet_ids = var.private ? module.network.private_subnet_ids : concat(module.network.private_subnet_ids, module.network.public_subnet_ids)
+  subnet_ids = var.private ? local.private_subnet_ids : concat(local.private_subnet_ids, local.public_subnet_ids)
 
   # autoscaling
   autoscaling = var.max_replicas != null
@@ -46,7 +46,7 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   aws_private_link   = var.private
   aws_subnet_ids     = local.subnet_ids
   machine_cidr       = var.vpc_cidr
-  availability_zones = module.network.private_subnet_azs
+  availability_zones = local.availability_zones
   multi_az           = var.multi_az
   pod_cidr           = var.pod_cidr
   service_cidr       = var.service_cidr
@@ -94,7 +94,7 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   private            = var.private
   aws_subnet_ids     = local.subnet_ids
   machine_cidr       = var.vpc_cidr
-  availability_zones = module.network.private_subnet_azs
+  availability_zones = local.availability_zones
   pod_cidr           = var.pod_cidr
   service_cidr       = var.service_cidr
 
