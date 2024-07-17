@@ -44,7 +44,7 @@ resource "aws_security_group" "bastion_host" {
 
   description = "Security group for Bastion access"
   name        = "${var.cluster_name}-bastion"
-  vpc_id      = module.network.vpc_id
+  vpc_id      = local.vpc_id
 
   # TODO: we technically should not need this if we are using sshuttle
   ingress {
@@ -71,7 +71,7 @@ resource "aws_instance" "bastion_host" {
 
   ami                    = data.aws_ami.rhel9[0].id
   instance_type          = "t2.micro"
-  subnet_id              = module.network.private_subnet_ids[0]
+  subnet_id              = local.private_subnet_ids[0]
   key_name               = aws_key_pair.bastion_host[0].key_name
   vpc_security_group_ids = [aws_security_group.bastion_host[0].id]
 
