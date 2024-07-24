@@ -2,6 +2,17 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
+data "rhcs_versions" "classic_versions" {
+  search = "enabled='t' and rosa_enabled='t' and channel_group='stable'"
+  order = "id"
+}
+
+data "rhcs_versions" "hcp_versions" {
+  search = "enabled='t' and rosa_enabled='t' and hosted_control_plane_enabled = 't' and channel_group='stable'"
+  order = "id"
+}
+
+
 #
 # cluster
 #
@@ -12,6 +23,10 @@ locals {
   # autoscaling
   autoscaling = var.max_replicas != null
   replicas    = var.replicas == null ? var.multi_az ? 3 : 2 : var.replicas
+
+  # version
+  classic_version = var.ocp_version == null ? var.ocp_version : element(data.rhcs_versions.classic_versions.items,length(data.rhcs_versions.classic_versions.items)-1).name
+  hcp_version = var.ocp_version == null ? var.ocp_version : element(data.rhcs_versions.hcp_versions.items,length(data.rhcs_versions.hcp_versions.items)-1).name
 }
 
 resource "validation_warning" "autoscaling_variable_deprecation" {
@@ -22,6 +37,8 @@ Please use 'replicas' with 'max_replicas' to enable autoscaling for ROSA Classic
 will enable the autoscaling feature.
 EOF
 }
+
+
 
 # classic
 resource "rhcs_cluster_rosa_classic" "rosa" {
@@ -53,7 +70,7 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
 
   # rosa / openshift
   properties = { rosa_creator_arn = data.aws_caller_identity.current.arn }
-  version    = var.ocp_version
+  version    = local.classic_version
   sts        = local.sts_roles
 
   disable_waiting_in_destroy = false
@@ -100,7 +117,7 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
 
   # rosa / openshift
   properties = { rosa_creator_arn = data.aws_caller_identity.current.arn }
-  version    = var.ocp_version
+  version    = local.hcp_version
   sts        = local.sts_roles
 
   disable_waiting_in_destroy          = false
