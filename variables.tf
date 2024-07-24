@@ -22,7 +22,7 @@ variable "region" {
 variable "multi_az" {
   description = <<EOF
   Configure the cluster to use a highly available, multi availability zone configuration.  It should be noted that use
-  of the 'multi_az' variable may affect minimum requirements for 'replicas' and may restrict regions that do not have 
+  of the 'multi_az' variable may affect minimum requirements for 'replicas' and may restrict regions that do not have
   three availability zones.
   EOF
   type        = bool
@@ -40,7 +40,7 @@ variable "autoscaling" {
   Enable autoscaling for the default machine pool, this is ignored for HCP clusters as autoscaling is not supported
   for Hosted Control Plane clusters at this time.
 
-  WARN: this variable is deprecated.  Simply setting 'max_replicas' will enable autoscaling.  This will be removed 
+  WARN: this variable is deprecated.  Simply setting 'max_replicas' will enable autoscaling.  This will be removed
   in a future version of this module.
   EOF
   type        = bool
@@ -50,7 +50,7 @@ variable "autoscaling" {
 
 variable "replicas" {
   description = <<EOF
-  Minimum number of replicas for the default machine pool.  If unset, a default value is configured based on the 
+  Minimum number of replicas for the default machine pool.  If unset, a default value is configured based on the
   'multi_az' value.
   EOF
   type        = number
@@ -60,7 +60,7 @@ variable "replicas" {
 
 variable "max_replicas" {
   description = <<EOF
-  Maximum number of replicas for the default machine pool.  If set, autoscaling is enabled for classic clusters.  
+  Maximum number of replicas for the default machine pool.  If set, autoscaling is enabled for classic clusters.
   Autoscaling is unsupported via Terraform for HCP clusters, so this value is always ignored when 'hosted_control_plane'
   is set to 'true'.  This value must be equal to or higher than the 'replicas' value if set.
   EOF
@@ -85,11 +85,11 @@ variable "cluster_name" {
 
 variable "ocp_version" {
   description = <<EOF
-  The version of OpenShift to use.  You can use the command 'rosa list versions' to see all available OpenShift 
+  The version of OpenShift to use.  You can use the command 'rosa list versions' to see all available OpenShift
   versions available to ROSA.
   EOF
   type        = string
-  default     = "4.15.18"
+  # default     = "4.15.18"
 }
 
 variable "vpc_cidr" {
@@ -100,7 +100,7 @@ variable "vpc_cidr" {
 
 variable "subnet_cidr_size" {
   description = <<EOF
-  The CIDR size of each of the individual subnets that will be created.  Must be within range of the 'vpc_cidr' 
+  The CIDR size of each of the individual subnets that will be created.  Must be within range of the 'vpc_cidr'
   variable.
   EOF
   type        = number
@@ -127,7 +127,7 @@ variable "tags" {
 
 variable "admin_password" {
   description = <<EOF
-  Password for the 'admin' user. IDP is not created if unspecified.  Password must be 14 characters or more, contain 
+  Password for the 'admin' user. IDP is not created if unspecified.  Password must be 14 characters or more, contain
   one uppercase letter and a symbol or number.
   EOF
   type        = string
@@ -136,7 +136,7 @@ variable "admin_password" {
 
 variable "developer_password" {
   description = <<EOF
-  Password for the 'developer' user. IDP is not created if unspecified.  Password must be 14 characters or more, contain 
+  Password for the 'developer' user. IDP is not created if unspecified.  Password must be 14 characters or more, contain
   one uppercase letter and a symbol or number.
   EOF
   type        = string
@@ -145,7 +145,7 @@ variable "developer_password" {
 
 variable "compute_machine_type" {
   description = <<EOF
-  The machine type used by the initial worker nodes, for example, m5.xlarge.  You can use the command 'rosa list 
+  The machine type used by the initial worker nodes, for example, m5.xlarge.  You can use the command 'rosa list
   instance-types' to see all available instance types available to ROSA.
   EOF
   type        = string
