@@ -80,13 +80,13 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
 
   lifecycle {
     precondition {
-      condition     = var.max_replicas != null ? var.max_replicas >= var.replicas : true
+      condition     = var.max_replicas != null ? var.max_replicas >= local.replicas : true
       error_message = "'max_replicas' must be greater than or equal to 'replicas' when set."
     }
 
     precondition {
-      condition     = var.multi_az ? var.replicas >= 3 : var.replicas >= 2
-      error_message = "'replicas' must be greater than or equal to 3 when 'multi_az' is set and 2 when it is not set."
+      condition     = var.multi_az ? (local.replicas % 3 == 0) : (local.replicas % 2 == 0)
+      error_message = "'replicas' must be divisible by 3 when 'multi_az' is set and 2 when it is not set."
     }
   }
 }
@@ -125,6 +125,12 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   wait_for_std_compute_nodes_complete = true
 
   depends_on = [module.network, module.account_roles_hcp, module.operator_roles_hcp]
+  lifecycle {
+    precondition {
+      condition     = var.multi_az ? (local.replicas % 3 == 0) : (local.replicas % 2 == 0)
+      error_message = "'replicas' must be divisible by 3 when 'multi_az' is set and 2 when it is not set."
+    }
+  }
 }
 
 locals {
