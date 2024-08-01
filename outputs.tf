@@ -41,3 +41,7 @@ output "cluster_api_url" {
 output "cluster_console_url" {
   value = local.cluster_console_url
 }
+
+output "cluster_id" {
+  value = local.cluster_id
+}
