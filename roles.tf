@@ -10,7 +10,7 @@ module "account_roles_classic" {
   version = "1.6.2-prerelease.1"
 
   account_role_prefix = var.cluster_name
-  openshift_version   = var.ocp_version
+  openshift_version   = local.classic_version
   tags                = var.tags
 }
 
@@ -47,7 +47,7 @@ module "operator_policies_classic" {
   version = "1.6.2-prerelease.1"
 
   account_role_prefix = var.cluster_name
-  openshift_version   = var.ocp_version
+  openshift_version   = local.classic_version
   tags                = var.tags
 }
 

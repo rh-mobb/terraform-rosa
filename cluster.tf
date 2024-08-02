@@ -25,8 +25,8 @@ locals {
   replicas    = var.replicas == null ? var.multi_az ? 3 : 2 : var.replicas
 
   # version
-  classic_version = var.ocp_version == null ? var.ocp_version : element(data.rhcs_versions.classic_versions.items,length(data.rhcs_versions.classic_versions.items)-1).name
-  hcp_version = var.ocp_version == null ? var.ocp_version : element(data.rhcs_versions.hcp_versions.items,length(data.rhcs_versions.hcp_versions.items)-1).name
+  classic_version = var.ocp_version != null ? var.ocp_version : element(data.rhcs_versions.classic_versions.items,length(data.rhcs_versions.classic_versions.items)-1).name
+  hcp_version = var.ocp_version != null ? var.ocp_version : element(data.rhcs_versions.hcp_versions.items,length(data.rhcs_versions.hcp_versions.items)-1).name
 }
 
 resource "validation_warning" "autoscaling_variable_deprecation" {
