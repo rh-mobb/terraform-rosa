@@ -7,7 +7,7 @@ module "account_roles_classic" {
   count = var.hosted_control_plane ? 0 : 1
 
   source  = "terraform-redhat/rosa-classic/rhcs//modules/account-iam-resources"
-  version = "1.6.2-"
+  version = "1.6.2"
 
   account_role_prefix = var.cluster_name
   openshift_version   = local.classic_version
