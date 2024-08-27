@@ -49,3 +49,18 @@ output "cluster_id" {
 output "cluster_name" {
   value = local.cluster_name
 }
+
+output "region" {
+  value = var.region
+}
+
+output "bastion_instance_id" {
+  value = var.private ? aws_instance.bastion_host[0].id : null
+}
+
+output "bastion_public_ip" {
+  value = (var.private && var.bastion_public_ip) ? aws_instance.bastion_host[0].public_ip : null
+}
+output "bastion_connectivity" {
+  value = local.bastion_output
+}
