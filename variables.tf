@@ -13,6 +13,12 @@ variable "bastion_public_ssh_key" {
   default     = "~/.ssh/id_rsa.pub"
 }
 
+variable "bastion_public_ip" {
+  description = "Should the Bastion have a public ip?"
+  type = bool
+  default = false
+}
+
 variable "region" {
   description = "The AWS region to provision a ROSA cluster and required components into."
   type        = string
