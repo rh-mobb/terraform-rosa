@@ -1,5 +1,5 @@
 init:
-	@terraform init
+	@terraform init -upgrade
 
 plan:
 	@export TF_VAR_token="$$(bw get password ocm-api-key)" && terraform plan -out main.plan -var-file=main.tfvars
