@@ -50,7 +50,7 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   cloud_region   = var.region
   aws_account_id = data.aws_caller_identity.current.account_id
   tags           = var.tags
-
+  ec2_metadata_http_tokens = "required"
   # autoscaling and instance settings
   compute_machine_type = var.compute_machine_type
   autoscaling_enabled  = local.autoscaling
@@ -98,11 +98,11 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   name = var.cluster_name
 
   # aws
-  cloud_region           = var.region
-  aws_account_id         = data.aws_caller_identity.current.account_id
-  aws_billing_account_id = data.aws_caller_identity.current.account_id
-  tags                   = var.tags
-
+  cloud_region             = var.region
+  aws_account_id           = data.aws_caller_identity.current.account_id
+  aws_billing_account_id   = data.aws_caller_identity.current.account_id
+  tags                     = var.tags
+  ec2_metadata_http_tokens = "required"
   # autoscaling and instance settings
   compute_machine_type = var.compute_machine_type
   replicas             = coalesce(var.replicas, local.replicas)
