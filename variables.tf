@@ -19,6 +19,12 @@ variable "bastion_public_ip" {
   default = false
 }
 
+variable "aws_billing_account_id" {
+  description = "The AWS billing account identifier where all resources are billed. If no information is provided, the data will be retrieved from the currently connected account."
+  type        = string
+  default     = null
+}
+
 variable "region" {
   description = "The AWS region to provision a ROSA cluster and required components into."
   type        = string
