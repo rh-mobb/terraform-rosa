@@ -100,13 +100,7 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   # aws
   cloud_region           = var.region
   aws_account_id         = data.aws_caller_identity.current.account_id
-  
-  if var.aws_billing_account_id != null {
-      aws_billing_account_id = var.aws_billing_account_id
-    } else {
-      aws_billing_account_id = data.aws_caller_identity.current.account_id 
-  }
-
+  aws_billing_account_id = var.aws_billing_account_id != null ? var.aws_billing_account_id : data.aws_caller_identity.current.account_id
   tags                   = var.tags
 
   # autoscaling and instance settings
