@@ -4,14 +4,13 @@ data "aws_region" "current" {}
 
 data "rhcs_versions" "classic_versions" {
   search = "enabled='t' and rosa_enabled='t' and channel_group='stable'"
-  order = "id"
+  order  = "id"
 }
 
 data "rhcs_versions" "hcp_versions" {
   search = "enabled='t' and rosa_enabled='t' and hosted_control_plane_enabled = 't' and channel_group='stable'"
-  order = "id"
+  order  = "id"
 }
-
 
 #
 # cluster
@@ -25,8 +24,8 @@ locals {
   replicas    = var.replicas == null ? var.multi_az ? 3 : 2 : var.replicas
 
   # version
-  classic_version = var.ocp_version != null ? var.ocp_version : element(data.rhcs_versions.classic_versions.items,length(data.rhcs_versions.classic_versions.items)-1).name
-  hcp_version = var.ocp_version != null ? var.ocp_version : element(data.rhcs_versions.hcp_versions.items,length(data.rhcs_versions.hcp_versions.items)-1).name
+  classic_version = var.ocp_version != null ? var.ocp_version : element(data.rhcs_versions.classic_versions.items, length(data.rhcs_versions.classic_versions.items) - 1).name
+  hcp_version     = var.ocp_version != null ? var.ocp_version : element(data.rhcs_versions.hcp_versions.items, length(data.rhcs_versions.hcp_versions.items) - 1).name
 }
 
 resource "validation_warning" "autoscaling_variable_deprecation" {
@@ -37,8 +36,6 @@ Please use 'replicas' with 'max_replicas' to enable autoscaling for ROSA Classic
 will enable the autoscaling feature.
 EOF
 }
-
-
 
 # classic
 resource "rhcs_cluster_rosa_classic" "rosa" {
