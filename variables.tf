@@ -15,8 +15,20 @@ variable "bastion_public_ssh_key" {
 
 variable "bastion_public_ip" {
   description = "Should the Bastion have a public ip?"
-  type = bool
-  default = false
+  type        = bool
+  default     = false
+}
+
+variable "bastion_cidr_blocks" {
+  description = "CIDR blocks for Bastion SSH Ingress"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "use_sshuttle" {
+  description = "Set to true to use sshuttle and skip creating security group for SSH access."
+  type        = bool
+  default     = true
 }
 
 variable "aws_billing_account_id" {
