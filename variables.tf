@@ -4,6 +4,12 @@ variable "private" {
   default     = false
 }
 
+variable "aws_profile" {
+  description = "The AWS profile to use for provisioning resources."
+  type        = string
+  default     = "default"
+}
+
 variable "bastion_public_ssh_key" {
   description = <<EOF
   Location to an SSH public key file on the local system which is used to provide connectivity to the bastion host
