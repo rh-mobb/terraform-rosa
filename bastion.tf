@@ -99,19 +99,18 @@ resource "aws_key_pair" "bastion_host" {
 }
 
 resource "aws_security_group" "bastion_host" {
-  count = var.private ? 1 : 0
+  count = var.private && !var.use_sshuttle ? 1 : 0
 
   description = "Security group for Bastion access"
   name        = "${var.cluster_name}-bastion"
   vpc_id      = module.network.vpc_id
 
-  # TODO: we technically should not need this if we are using sshuttle
   ingress {
     description = "Bastion SSH Ingress"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.bastion_cidr_blocks
   }
 
   egress {

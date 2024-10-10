@@ -4,6 +4,12 @@ variable "private" {
   default     = false
 }
 
+variable "aws_profile" {
+  description = "The AWS profile to use for provisioning resources."
+  type        = string
+  default     = "default"
+}
+
 variable "bastion_public_ssh_key" {
   description = <<EOF
   Location to an SSH public key file on the local system which is used to provide connectivity to the bastion host
@@ -15,8 +21,20 @@ variable "bastion_public_ssh_key" {
 
 variable "bastion_public_ip" {
   description = "Should the Bastion have a public ip?"
-  type = bool
-  default = false
+  type        = bool
+  default     = false
+}
+
+variable "bastion_cidr_blocks" {
+  description = "CIDR blocks for Bastion SSH Ingress"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "use_sshuttle" {
+  description = "Set to true to use sshuttle and skip creating security group for SSH access."
+  type        = bool
+  default     = true
 }
 
 variable "aws_billing_account_id" {
