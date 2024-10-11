@@ -37,6 +37,15 @@ variable "use_sshuttle" {
   default     = true
 }
 
+variable "bastion_ami_id" {
+  description = <<EOF
+  The AMI ID to use for the bastion host.  If not set, the latest RHEL 9 AMI is used.  This is only used when
+  'private' is set to 'true'.
+  EOF
+  type        = string
+  default     = null
+}
+
 variable "aws_billing_account_id" {
   description = "The AWS billing account identifier where all resources are billed. If no information is provided, the data will be retrieved from the currently connected account."
   type        = string

@@ -61,33 +61,33 @@ resource "aws_iam_role_policy_attachment" "bastion_iam_ssm_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-data "aws_ami" "rhel9" {
-  count = var.private ? 1 : 0
+# data "aws_ami" "rhel9" {
+#   count = var.private ? 1 : 0
 
-  executable_users = ["self"]
-  owners           = ["309956199498"]
-  most_recent      = true
+#   executable_users = ["self"]
+#   owners           = ["309956199498"]
+#   most_recent      = true
 
-  filter {
-    name   = "name"
-    values = ["RHEL-9*"]
-  }
+#   filter {
+#     name   = "name"
+#     values = ["RHEL-9*"]
+#   }
 
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
+#   filter {
+#     name   = "architecture"
+#     values = ["x86_64"]
+#   }
 
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
+#   filter {
+#     name   = "root-device-type"
+#     values = ["ebs"]
+#   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+# }
 
 resource "aws_key_pair" "bastion_host" {
   count = var.private ? 1 : 0
@@ -127,7 +127,7 @@ resource "aws_security_group" "bastion_host" {
 resource "aws_instance" "bastion_host" {
   count = var.private ? 1 : 0
 
-  ami                         = data.aws_ami.rhel9[0].id
+  ami                         = var.bastion_ami_id
   instance_type               = "t2.micro"
   iam_instance_profile        = aws_iam_instance_profile.bastion_iam_profile[0].name
   subnet_id                   = local.bastion_subnet
