@@ -4,9 +4,9 @@ locals {
   bastion_ssh    = <<EOF
 You can SSH to your bastion via
 
-    ssh ec2-user@${(var.private && var.bastion_public_ip) ? aws_instance.bastion_host[0].public_ip : ""}
+    ssh ec2-user@${(var.private && var.bastion_public_ip) ? aws_instance.bastion_host.public_ip : ""}
     or
-    sshuttle --remote ec2-user@${(var.private && var.bastion_public_ip) ? aws_instance.bastion_host[0].public_ip : ""}--dns ${var.vpc_cidr}
+    sshuttle --remote ec2-user@${(var.private && var.bastion_public_ip) ? aws_instance.bastion_host.public_ip : ""}--dns ${var.vpc_cidr}
 EOF
   bastion_ssm    = <<EOF
 Congratulations on securely deploying your bastion to a private subnet with no public internet ingress!
@@ -27,19 +27,17 @@ Uhhh so how do I access my cluster?  Glad you asked!
 3. Create an SSH VPN over AWS Session Manager
 
     sshuttle --ssh-cmd="ssh -o ProxyCommand='sh -c \"aws --region ${var.region} ssm start-session --target %h --document-name AWS-StartSSHSession --parameters \
-    portNumber=22\"'" --remote ec2-user@${(var.private && !var.bastion_public_ip) ? aws_instance.bastion_host[0].id : ""} --dns ${var.vpc_cidr}
+    portNumber=22\"'" --remote ec2-user@${(var.private && !var.bastion_public_ip) ? aws_instance.bastion_host.id : ""} --dns ${var.vpc_cidr}
 EOF
   bastion_output = var.private ? (var.bastion_public_ip ? local.bastion_ssh : local.bastion_ssm) : null
 }
 
 resource "aws_iam_instance_profile" "bastion_iam_profile" {
-  count = var.private ? 1 : 0
   name  = "${var.cluster_name}-bastion-ec2_profile"
-  role  = aws_iam_role.bastion_iam_role[0].name
+  role  = aws_iam_role.bastion_iam_role.name
 }
 
 resource "aws_iam_role" "bastion_iam_role" {
-  count       = var.private ? 1 : 0
   name        = "${var.cluster_name}-bastion-iam-role"
   description = "The role for the bastion EC2"
 
@@ -56,41 +54,11 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "bastion_iam_ssm_policy" {
-  count      = var.private ? 1 : 0
-  role       = aws_iam_role.bastion_iam_role[0].name
+  role       = aws_iam_role.bastion_iam_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-# data "aws_ami" "rhel9" {
-#   count = var.private ? 1 : 0
-
-#   executable_users = ["self"]
-#   owners           = ["309956199498"]
-#   most_recent      = true
-
-#   filter {
-#     name   = "name"
-#     values = ["RHEL-9*"]
-#   }
-
-#   filter {
-#     name   = "architecture"
-#     values = ["x86_64"]
-#   }
-
-#   filter {
-#     name   = "root-device-type"
-#     values = ["ebs"]
-#   }
-
-#   filter {
-#     name   = "virtualization-type"
-#     values = ["hvm"]
-#   }
-# }
-
 resource "aws_key_pair" "bastion_host" {
-  count = var.private ? 1 : 0
 
   key_name   = "${var.cluster_name}-bastion"
   public_key = file(var.bastion_public_ssh_key)
@@ -99,7 +67,6 @@ resource "aws_key_pair" "bastion_host" {
 }
 
 resource "aws_security_group" "bastion_host" {
-  count = var.private && !var.use_sshuttle ? 1 : 0
 
   description = "Security group for Bastion access"
   name        = "${var.cluster_name}-bastion"
@@ -125,15 +92,14 @@ resource "aws_security_group" "bastion_host" {
 }
 
 resource "aws_instance" "bastion_host" {
-  count = var.private ? 1 : 0
 
   ami                         = var.bastion_ami_id
   instance_type               = "t2.micro"
-  iam_instance_profile        = aws_iam_instance_profile.bastion_iam_profile[0].name
+  iam_instance_profile        = aws_iam_instance_profile.bastion_iam_profile.name
   subnet_id                   = local.bastion_subnet
   associate_public_ip_address = var.bastion_public_ip
-  key_name                    = aws_key_pair.bastion_host[0].key_name
-  vpc_security_group_ids      = [aws_security_group.bastion_host[0].id]
+  key_name                    = aws_key_pair.bastion_host.key_name
+  vpc_security_group_ids      = [aws_security_group.bastion_host.id]
 
   tags = local.bastion_tags
 
