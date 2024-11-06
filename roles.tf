@@ -7,7 +7,7 @@ module "account_roles_classic" {
   count = var.hosted_control_plane ? 0 : 1
 
   source  = "terraform-redhat/rosa-classic/rhcs//modules/account-iam-resources"
-  version = "1.6.3"
+  version = "1.6.4"
 
   account_role_prefix = var.cluster_name
   openshift_version   = local.classic_version
@@ -19,7 +19,7 @@ module "account_roles_hcp" {
   count = var.hosted_control_plane ? 1 : 0
 
   source  = "terraform-redhat/rosa-hcp/rhcs//modules/account-iam-resources"
-  version = "1.6.3"
+  version = "1.6.4"
 
   account_role_prefix = var.cluster_name
   tags                = var.tags
@@ -34,7 +34,7 @@ module "oidc_config_and_provider_classic" {
   count = var.hosted_control_plane ? 0 : 1
 
   source  = "terraform-redhat/rosa-classic/rhcs//modules/oidc-config-and-provider"
-  version = "1.6.3"
+  version = "1.6.4"
 
   managed = true
   tags    = var.tags
@@ -44,7 +44,7 @@ module "operator_policies_classic" {
   count = var.hosted_control_plane ? 0 : 1
 
   source  = "terraform-redhat/rosa-classic/rhcs//modules/operator-policies"
-  version = "1.6.3"
+  version = "1.6.4"
 
   account_role_prefix = var.cluster_name
   openshift_version   = local.classic_version
@@ -55,7 +55,7 @@ module "operator_roles_classic" {
   count = var.hosted_control_plane ? 0 : 1
 
   source  = "terraform-redhat/rosa-classic/rhcs//modules/operator-roles"
-  version = "1.6.3"
+  version = "1.6.4"
 
   operator_role_prefix = var.cluster_name
   account_role_prefix  = module.operator_policies_classic[0].account_role_prefix
@@ -68,7 +68,7 @@ module "oidc_config_and_provider_hcp" {
   count = var.hosted_control_plane ? 1 : 0
 
   source  = "terraform-redhat/rosa-hcp/rhcs//modules/oidc-config-and-provider"
-  version = "1.6.3"
+  version = "1.6.4"
 
   managed = true
   tags    = var.tags
@@ -78,7 +78,7 @@ module "operator_roles_hcp" {
   count = var.hosted_control_plane ? 1 : 0
 
   source  = "terraform-redhat/rosa-hcp/rhcs//modules/operator-roles"
-  version = "1.6.3"
+  version = "1.6.4"
 
   oidc_endpoint_url    = module.oidc_config_and_provider_hcp[0].oidc_endpoint_url
   operator_role_prefix = var.cluster_name
