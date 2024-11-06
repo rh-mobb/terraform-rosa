@@ -32,12 +32,12 @@ locals {
   #     - if unspecified and single-az, use 2
   #
   autoscaling  = var.max_replicas != null
-  replicas     = var.replicas == null ? var.multi_az ? length(local.subnet_ids) : 2 : var.replicas
+  replicas     = var.replicas == null ? var.multi_az ? length(module.network.private_subnet_ids) : 2 : var.replicas
   hcp_replicas = var.replicas == null ? var.multi_az ? 1 : 2 : var.replicas
 
   # hosted control plane default machine pool
   hcp_machine_pools = !var.hosted_control_plane ? [] : !var.multi_az ? ["workers"] : [
-    for idx, subnet in local.subnet_ids : "workers-${idx}"
+    for idx, subnet in module.network.private_subnet_ids : "workers-${idx}"
   ]
 
   # version
@@ -118,6 +118,11 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   aws_billing_account_id = var.aws_billing_account_id != null ? var.aws_billing_account_id : data.aws_caller_identity.current.account_id
   tags                   = var.tags
 
+  # NOTE: we are only deriving this because we use the rhcs_hcp_machine_pool.default resource to manage our
+  #       machine pools and we require this input for the cluster.
+  replicas                 = var.multi_az ? 3 : 2
+  ec2_metadata_http_tokens = "required"
+
   # network
   private            = var.private
   aws_subnet_ids     = local.subnet_ids
@@ -138,6 +143,7 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   depends_on = [module.network, module.account_roles_hcp, module.operator_roles_hcp]
 }
 
+# see https://registry.terraform.io/providers/terraform-redhat/rhcs/latest/docs/guides/worker-machine-pool for background
 resource "rhcs_hcp_machine_pool" "default" {
   count = var.hosted_control_plane ? length(local.hcp_machine_pools) : 0
 
