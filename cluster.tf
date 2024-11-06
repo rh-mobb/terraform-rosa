@@ -20,8 +20,25 @@ locals {
   subnet_ids = var.private ? module.network.private_subnet_ids : concat(module.network.private_subnet_ids, module.network.public_subnet_ids)
 
   # autoscaling
-  autoscaling = var.max_replicas != null
-  replicas    = var.replicas == null ? var.multi_az ? 3 : 2 : var.replicas
+  #
+  # NOTE:
+  #   classic: 
+  #     - if specified, use the var.replicas value
+  #     - if unspecified and multi-az, use the number of subnets because classic uses one machine pool for all subnets
+  #     - if unspecified and single-az, use 2 for high availability
+  #   hcp:
+  #     - if specified, use the var.replicas value, this value is valid for each subnet as hcp individualizes machine pools in each subnet
+  #     - if unspecified and multi-az, use 1 as we create a machine pool per subnet
+  #     - if unspecified and single-az, use 2
+  #
+  autoscaling  = var.max_replicas != null
+  replicas     = var.replicas == null ? var.multi_az ? length(local.subnet_ids) : 2 : var.replicas
+  hcp_replicas = var.replicas == null ? var.multi_az ? 1 : 2 : var.replicas
+
+  # hosted control plane default machine pool
+  hcp_machine_pools = !var.hosted_control_plane ? [] : !var.multi_az ? ["workers"] : [
+    for idx, subnet in local.subnet_ids : "workers-${idx}"
+  ]
 
   # version
   classic_version = var.ocp_version != null ? var.ocp_version : element(data.rhcs_versions.classic_versions.items, length(data.rhcs_versions.classic_versions.items) - 1).name
@@ -100,10 +117,6 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   aws_billing_account_id = var.aws_billing_account_id != null ? var.aws_billing_account_id : data.aws_caller_identity.current.account_id
   tags                   = var.tags
 
-  # autoscaling and instance settings
-  compute_machine_type = var.compute_machine_type
-  replicas             = coalesce(var.replicas, local.replicas)
-
   # network
   private            = var.private
   aws_subnet_ids     = local.subnet_ids
@@ -122,10 +135,36 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   wait_for_std_compute_nodes_complete = true
 
   depends_on = [module.network, module.account_roles_hcp, module.operator_roles_hcp]
+}
+
+resource "rhcs_hcp_machine_pool" "default" {
+  count = var.hosted_control_plane ? length(local.hcp_machine_pools) : 0
+
+  name        = local.hcp_machine_pools[count.index]
+  cluster     = rhcs_cluster_rosa_hcp.rosa[0].id
+  subnet_id   = local.subnet_ids[count.index]
+  auto_repair = true
+
+  autoscaling = {
+    enabled      = local.autoscaling
+    min_replicas = local.autoscaling ? local.hcp_replicas : null
+    max_replicas = local.autoscaling ? var.max_replicas : null
+  }
+
+  aws_node_pool = {
+    instance_type = var.compute_machine_type
+    tags          = var.tags
+  }
+
   lifecycle {
     precondition {
-      condition     = var.multi_az ? (local.replicas % 3 == 0) : (local.replicas % 2 == 0)
-      error_message = "'replicas' must be divisible by 3 when 'multi_az' is set and 2 when it is not set."
+      condition     = var.multi_az ? true : (local.hcp_replicas >= 2)
+      error_message = "must have a minimum of 2 'replicas' for single az use cases."
+    }
+
+    precondition {
+      condition     = local.autoscaling ? var.max_replicas >= local.hcp_replicas : true
+      error_message = "'max_replicas' must be greater than 'replicas'."
     }
   }
 }

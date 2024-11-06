@@ -15,8 +15,8 @@ variable "bastion_public_ssh_key" {
 
 variable "bastion_public_ip" {
   description = "Should the Bastion have a public ip?"
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }
 
 variable "aws_billing_account_id" {
@@ -72,9 +72,10 @@ variable "replicas" {
 
 variable "max_replicas" {
   description = <<EOF
-  Maximum number of replicas for the default machine pool.  If set, autoscaling is enabled for classic clusters.
-  Autoscaling is unsupported via Terraform for HCP clusters, so this value is always ignored when 'hosted_control_plane'
-  is set to 'true'.  This value must be equal to or higher than the 'replicas' value if set.
+  Maximum number of replicas for the default machine pool.  If set, autoscaling is enabled.  If 
+  'hosted_control_plane' is also set to true, understand that 'max_replicas' is for each subnet.  For example, if 
+  you use 'multi_az' (3 subnets) and set a 'max_replicas' value of 3.  You could end up with 9 total replicas, 3 per
+  subnet.
   EOF
   type        = number
   nullable    = true
