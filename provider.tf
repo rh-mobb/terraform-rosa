@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     rhcs = {
-      version = ">= 1.6.4"
+      version = ">= 1.6.6"
       source  = "terraform-redhat/rhcs"
     }
 
@@ -9,6 +9,7 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 4.20.0"
     }
+
     validation = {
       source  = "tlkamp/validation"
       version = "1.1.1"
