@@ -22,7 +22,7 @@ locals {
   # autoscaling
   #
   # NOTE:
-  #   classic: 
+  #   classic:
   #     - if specified, use the var.replicas value
   #     - if unspecified and multi-az, use the number of subnets because classic uses one machine pool for all subnets
   #     - if unspecified and single-az, use 2 for high availability
@@ -120,7 +120,7 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
 
   # NOTE: we are only deriving this because we use the rhcs_hcp_machine_pool.default resource to manage our
   #       machine pools and we require this input for the cluster.
-  replicas                 = var.multi_az ? 3 : 2
+  replicas                 = local.hcp_replicas # var.multi_az ? 3 : 2
   ec2_metadata_http_tokens = "required"
 
   # network
@@ -151,7 +151,7 @@ resource "rhcs_hcp_machine_pool" "default" {
   cluster     = rhcs_cluster_rosa_hcp.rosa[0].id
   subnet_id   = local.subnet_ids[count.index]
   auto_repair = true
-
+  replicas = local.hcp_replicas
   autoscaling = {
     enabled      = local.autoscaling
     min_replicas = local.autoscaling ? local.hcp_replicas : null
