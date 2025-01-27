@@ -7,8 +7,8 @@ data "aws_availability_zones" "available" {
   }
 
   filter {
-    name   = "group-name"
-    values = [data.aws_region.current.name]
+    name = "zone-type"
+    values = ["availability-zone"]
   }
 
   filter {
