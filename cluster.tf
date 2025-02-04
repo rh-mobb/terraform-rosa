@@ -120,7 +120,7 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
 
   # NOTE: we are only deriving this because we use the rhcs_hcp_machine_pool.default resource to manage our
   #       machine pools and we require this input for the cluster.
-  replicas                 = local.hcp_replicas # var.multi_az ? 3 : 2
+  replicas                 = local.hcp_replicas
   ec2_metadata_http_tokens = "required"
 
   # network
@@ -151,7 +151,10 @@ resource "rhcs_hcp_machine_pool" "default" {
   cluster     = rhcs_cluster_rosa_hcp.rosa[0].id
   subnet_id   = local.subnet_ids[count.index]
   auto_repair = true
-  replicas = local.hcp_replicas
+
+  # NOTE: if autoscaling is specified via the max_replicas variable, set replicas to null as the API will reject 
+  #       setting both replicas and autoscaling.*_replicas
+  replicas = local.autoscaling ? null : local.hcp_replicas
   autoscaling = {
     enabled      = local.autoscaling
     min_replicas = local.autoscaling ? local.hcp_replicas : null
