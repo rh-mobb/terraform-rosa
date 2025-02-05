@@ -132,9 +132,10 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   service_cidr       = var.service_cidr
 
   # rosa / openshift
-  properties = { rosa_creator_arn = data.aws_caller_identity.current.arn }
-  version    = local.hcp_version
-  sts        = local.sts_roles
+  compute_machine_type = var.compute_machine_type
+  properties           = { rosa_creator_arn = data.aws_caller_identity.current.arn }
+  version              = local.hcp_version
+  sts                  = local.sts_roles
 
   disable_waiting_in_destroy          = false
   wait_for_create_complete            = true
@@ -144,17 +145,24 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
 }
 
 # see https://registry.terraform.io/providers/terraform-redhat/rhcs/latest/docs/guides/worker-machine-pool for background
-resource "rhcs_hcp_machine_pool" "default" {
+data "rhcs_hcp_machine_pool" "default" {
   count = var.hosted_control_plane ? length(local.hcp_machine_pools) : 0
 
-  name        = local.hcp_machine_pools[count.index]
+  cluster = rhcs_cluster_rosa_hcp.rosa[0].id
+  name    = local.hcp_machine_pools[count.index]
+}
+
+resource "rhcs_hcp_machine_pool" "default" {
+  count = var.hosted_control_plane ? length(data.rhcs_hcp_machine_pool.default) : 0
+
+  name        = data.rhcs_hcp_machine_pool.default[count.index].name
   cluster     = rhcs_cluster_rosa_hcp.rosa[0].id
-  subnet_id   = local.subnet_ids[count.index]
-  auto_repair = true
+  subnet_id   = data.rhcs_hcp_machine_pool.default[count.index].subnet_id
+  auto_repair = data.rhcs_hcp_machine_pool.default[count.index].auto_repair
 
   # NOTE: if autoscaling is specified via the max_replicas variable, set replicas to null as the API will reject 
   #       setting both replicas and autoscaling.*_replicas
-  replicas = local.autoscaling ? null : local.hcp_replicas
+  replicas = local.autoscaling ? null : data.rhcs_hcp_machine_pool.default[count.index].replicas
   autoscaling = {
     enabled      = local.autoscaling
     min_replicas = local.autoscaling ? local.hcp_replicas : null
@@ -162,8 +170,8 @@ resource "rhcs_hcp_machine_pool" "default" {
   }
 
   aws_node_pool = {
-    instance_type            = var.compute_machine_type
-    ec2_metadata_http_tokens = "required"
+    instance_type            = data.rhcs_hcp_machine_pool.default[count.index].aws_node_pool.instance_type
+    ec2_metadata_http_tokens = data.rhcs_hcp_machine_pool.default[count.index].aws_node_pool.ec2_metadata_http_tokens
     tags                     = var.tags
   }
 
