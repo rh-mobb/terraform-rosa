@@ -2,6 +2,8 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
+data "aws_partition" "current" {}
+
 data "rhcs_versions" "classic_versions" {
   search = "enabled='t' and rosa_enabled='t' and channel_group='stable'"
   order  = "id"
@@ -74,8 +76,8 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   replicas             = local.autoscaling ? null : coalesce(var.replicas, local.replicas)
 
   # network
-  private            = var.private
-  aws_private_link   = var.private
+  private            = var.govcloud || var.private
+  aws_private_link   = var.govcloud || var.private
   aws_subnet_ids     = local.subnet_ids
   machine_cidr       = var.vpc_cidr
   availability_zones = module.network.private_subnet_azs
@@ -87,6 +89,7 @@ resource "rhcs_cluster_rosa_classic" "rosa" {
   properties = { rosa_creator_arn = data.aws_caller_identity.current.arn }
   version    = local.classic_version
   sts        = local.sts_roles
+  fips       = var.govcloud || var.fips
 
   disable_waiting_in_destroy = false
   wait_for_create_complete   = true
