@@ -19,7 +19,7 @@ data "rhcs_versions" "hcp_versions" {
 #
 locals {
   # networking
-  subnet_ids = var.private ? module.network.private_subnet_ids : concat(module.network.private_subnet_ids, module.network.public_subnet_ids)
+  subnet_ids = var.private || var.govcloud ? module.network.private_subnet_ids : concat(module.network.private_subnet_ids, module.network.public_subnet_ids)
 
   # autoscaling
   #
