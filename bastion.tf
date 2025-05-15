@@ -58,14 +58,14 @@ EOF
 resource "aws_iam_role_policy_attachment" "bastion_iam_ssm_policy" {
   count      = var.private ? 1 : 0
   role       = aws_iam_role.bastion_iam_role[0].name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 data "aws_ami" "rhel9" {
   count = var.private ? 1 : 0
 
-  executable_users = ["self"]
-  owners           = ["309956199498"]
+  # executable_users = ["self"]
+  owners           = ["309956199498", "219670896067"]
   most_recent      = true
 
   filter {
@@ -129,7 +129,7 @@ resource "aws_instance" "bastion_host" {
   count = var.private ? 1 : 0
 
   ami                         = data.aws_ami.rhel9[0].id
-  instance_type               = "t2.micro"
+  instance_type               = "t3.micro"
   iam_instance_profile        = aws_iam_instance_profile.bastion_iam_profile[0].name
   subnet_id                   = local.bastion_subnet
   associate_public_ip_address = var.bastion_public_ip

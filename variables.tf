@@ -165,3 +165,21 @@ variable "compute_machine_type" {
   type        = string
   default     = "m5.xlarge"
 }
+
+
+variable "govcloud" {
+  description = <<EOF
+  Whether this is for GovCloud or commercial. Use 'true' for GovCloud installations.
+  EOF
+  type        = bool
+  default     = false
+}
+
+variable "fips" {
+  description = <<EOF
+  Create cluster that uses FIPS Validated / Modules in Process cryptographic libraries.
+  After the creation of the resource, it is not possible to update the attribute value.
+  EOF
+  type        = bool
+  default     = false
+}
