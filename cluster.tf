@@ -33,7 +33,7 @@ locals {
   #
   autoscaling  = var.max_replicas != null
   replicas     = var.replicas == null ? var.multi_az ? length(module.network.private_subnet_ids) : 2 : var.replicas
-  hcp_replicas = var.replicas == null ? var.multi_az ? 1 : 2 : var.replicas
+  hcp_replicas = var.replicas == null ? var.multi_az ? 3 : 2 : var.replicas
 
   # hosted control plane default machine pool
   hcp_machine_pools = !var.hosted_control_plane ? [] : !var.multi_az ? ["workers"] : [
