@@ -44,7 +44,11 @@ variable "multi_az" {
 variable "hosted_control_plane" {
   description = "Provision a ROSA cluster using a Hosted Control Plane."
   type        = bool
-  default     = false
+  default     = true
+  validation {
+    condition = var.hosted_control_plane == true
+    error_message = "Classic Clusters are no longer supported by this Terraform Example"
+  }
 }
 
 variable "autoscaling" {
@@ -72,8 +76,8 @@ variable "replicas" {
 
 variable "max_replicas" {
   description = <<EOF
-  Maximum number of replicas for the default machine pool.  If set, autoscaling is enabled.  If 
-  'hosted_control_plane' is also set to true, understand that 'max_replicas' is for each subnet.  For example, if 
+  Maximum number of replicas for the default machine pool.  If set, autoscaling is enabled.  If
+  'hosted_control_plane' is also set to true, understand that 'max_replicas' is for each subnet.  For example, if
   you use 'multi_az' (3 subnets) and set a 'max_replicas' value of 3.  You could end up with 9 total replicas, 3 per
   subnet.
   EOF
