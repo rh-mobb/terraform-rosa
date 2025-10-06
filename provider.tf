@@ -1,15 +1,13 @@
 terraform {
   required_providers {
     rhcs = {
-      version = ">= 1.6.9"
       source  = "terraform-redhat/rhcs"
+      version = ">= 1.7.1"
     }
-
     aws = {
       source  = "hashicorp/aws"
       version = ">= 4.20.0"
     }
-
     validation = {
       source  = "tlkamp/validation"
       version = "1.1.1"
@@ -18,10 +16,10 @@ terraform {
 }
 
 provider "rhcs" {
-  token = var.token
-  url   = var.govcloud ? "https://api.openshiftusgov.com" : "https://api.openshift.com"
-  token_url = var.govcloud ? "https://sso.openshiftusgov.com/realms/redhat-external/protocol/openid-connect/token" : "https://sso.redhat.com/realms/redhat-external/protocol/openid-connect/token"
-  client_id = var.govcloud ? "console-dot" : "cloud-services"
+  token        = var.token
+  url          = var.govcloud ? "https://api.openshiftusgov.com" : "https://api.openshift.com"
+  token_url    = var.govcloud ? "https://sso.openshiftusgov.com/auth/realms/redhat-external/protocol/openid-connect/token" : "https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token"
+  client_id    = var.govcloud ? "console-dot" : "cloud-services"
   client_secret = ""
 }
 
