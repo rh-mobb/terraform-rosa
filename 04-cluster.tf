@@ -1,7 +1,5 @@
 data "aws_caller_identity" "current" {}
 
-data "aws_region" "current" {}
-
 data "aws_partition" "current" {}
 
 data "rhcs_versions" "classic_versions" {
@@ -45,15 +43,6 @@ locals {
   # version
   classic_version = var.ocp_version != null ? var.ocp_version : element(data.rhcs_versions.classic_versions.items, length(data.rhcs_versions.classic_versions.items) - 1).name
   hcp_version     = var.ocp_version != null ? var.ocp_version : element(data.rhcs_versions.hcp_versions.items, length(data.rhcs_versions.hcp_versions.items) - 1).name
-}
-
-resource "validation_warning" "autoscaling_variable_deprecation" {
-  condition = var.autoscaling != null
-  summary   = "The 'autoscaling' variable will be deprecated in a future release.'"
-  details   = <<EOF
-Please use 'replicas' with 'max_replicas' to enable autoscaling for ROSA Classic clusters.  Setting 'max_replicas'
-will enable the autoscaling feature.
-EOF
 }
 
 # classic
@@ -163,7 +152,7 @@ resource "rhcs_hcp_machine_pool" "default" {
   subnet_id   = data.rhcs_hcp_machine_pool.default[count.index].subnet_id
   auto_repair = data.rhcs_hcp_machine_pool.default[count.index].auto_repair
 
-  # NOTE: if autoscaling is specified via the max_replicas variable, set replicas to null as the API will reject 
+  # NOTE: if autoscaling is specified via the max_replicas variable, set replicas to null as the API will reject
   #       setting both replicas and autoscaling.*_replicas
   replicas = local.autoscaling ? null : data.rhcs_hcp_machine_pool.default[count.index].replicas
   autoscaling = {

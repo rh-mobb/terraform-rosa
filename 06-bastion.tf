@@ -6,7 +6,7 @@ You can SSH to your bastion via
 
     ssh ec2-user@${(var.private && var.bastion_public_ip) ? aws_instance.bastion_host[0].public_ip : ""}
     or
-    sshuttle --remote ec2-user@${(var.private && var.bastion_public_ip) ? aws_instance.bastion_host[0].public_ip : ""}--dns ${var.vpc_cidr}
+    sshuttle --remote ec2-user@${(var.private && var.bastion_public_ip) ? aws_instance.bastion_host[0].public_ip : ""} --dns ${var.vpc_cidr}
 EOF
   bastion_ssm    = <<EOF
 Congratulations on securely deploying your bastion to a private subnet with no public internet ingress!
@@ -65,8 +65,8 @@ data "aws_ami" "rhel9" {
   count = var.private ? 1 : 0
 
   # executable_users = ["self"]
-  owners           = ["309956199498", "219670896067"]
-  most_recent      = true
+  owners      = ["309956199498", "219670896067"]
+  most_recent = true
 
   filter {
     name   = "name"
@@ -105,13 +105,14 @@ resource "aws_security_group" "bastion_host" {
   name        = "${var.cluster_name}-bastion"
   vpc_id      = module.network.vpc_id
 
-  # TODO: we technically should not need this if we are using sshuttle
+  # SSH access - only needed if bastion_public_ip is true
+  # When using sshuttle with SSM, this ingress rule is not required
   ingress {
     description = "Bastion SSH Ingress"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.bastion_public_ip ? ["0.0.0.0/0"] : []
   }
 
   egress {
