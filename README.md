@@ -73,13 +73,17 @@ terraform apply rosa.plan
 make pr
 ```
 
-This will validate your Terraform configuration, check formatting, and verify that a plan can be created successfully.
+This will validate your Terraform configuration, check formatting, and run linting tools. For a full test suite including terraform plan (requires credentials), use:
+
+```bash
+make test
+```
 
 Optional linting tools (recommended):
 - **tflint**: Terraform linter for best practices (`brew install tflint`)
 - **checkov**: Security scanning (`pip install checkov`)
 
-These tools are optional - `make pr` will use them if installed, but won't fail if they're missing.
+These tools are optional - both `make pr` and `make test` will use them if installed, but won't fail if they're missing.
 
 ## Requirements
 

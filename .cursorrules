@@ -8,6 +8,6 @@ Key points:
 - Shell variables in provisioners use single `$` (Terraform only interpolates `${...}`)
 - Private clusters cannot use cluster login or GitOps deployment
 - Default to HCP clusters (`TF_VAR_hosted_control_plane=true` by default)
-- **Before committing**: Run `make pr` to validate, check formatting, and verify the plan
+- **Before committing**: Run `make pr` to validate, check formatting, and run linting (or `make test` for full suite including plan)
 
 See AGENTS.md for detailed documentation.

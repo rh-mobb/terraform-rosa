@@ -212,7 +212,8 @@ make hcp
 - Include context in error messages (what failed, why, how to fix)
 
 ### CI/CD Considerations
-- Run `make pr` in CI/CD pipelines before merging
+- Run `make pr` in CI/CD pipelines before merging (skips plan, no credentials needed)
+- Run `make test` locally for full validation including terraform plan
 - Use remote state backends in CI/CD environments
 - Configure appropriate state locking timeouts
 - Use service accounts/roles with minimal required permissions

@@ -1,4 +1,4 @@
-.PHONY: help init plan apply destroy login check-env cluster cluster-public cluster-private classic hcp pr
+.PHONY: help init plan apply destroy login check-env cluster cluster-public cluster-private classic hcp test pr
 
 REQUIRED_ENVS = TF_VAR_admin_password TF_VAR_cluster_name TF_VAR_token
 
@@ -39,7 +39,8 @@ help: ## Show this help message
 	@echo "  make apply                        # Apply the plan"
 	@echo "  make destroy                      # Destroy the infrastructure"
 	@echo "  make login                        # Login to the cluster with oc CLI"
-	@echo "  make pr                           # Run pre-commit checks (validate, fmt, plan)"
+	@echo "  make test                         # Run full test suite (validate, fmt, lint, plan)"
+	@echo "  make pr                           # Run pre-commit checks (validate, fmt, lint - skips plan)"
 	@echo ""
 	@echo "Deploy with GitOps operator:"
 	@echo "  TF_VAR_deploy_gitops=true make cluster  # Deploy cluster with GitOps operator"
@@ -87,25 +88,8 @@ check-env: ## Verify required environment variables are set
 	@test -n "$(TF_VAR_cluster_name)" || (echo "ERROR: Please set TF_VAR_cluster_name" && exit 1)
 	@test -n "$(TF_VAR_token)" || (echo "ERROR: Please set TF_VAR_token" && exit 1)
 
-pr: check-env init ## Run pre-commit checks (validate, fmt -check, plan)
-	@echo "Running Terraform validate..."
-	@terraform validate || (echo "ERROR: Terraform validate failed" && exit 1)
-	@echo "Running Terraform fmt -check..."
-	@terraform fmt -check -recursive || (echo "ERROR: Terraform fmt -check failed. Run 'terraform fmt -recursive' to fix." && exit 1)
-	@if command -v tflint >/dev/null 2>&1; then \
-		echo "Running tflint..."; \
-		tflint --init || true; \
-		tflint || (echo "ERROR: tflint failed" && exit 1); \
-	else \
-		echo "⚠ tflint not found (optional - install with: brew install tflint)"; \
-	fi
-	@if command -v checkov >/dev/null 2>&1; then \
-		echo "Running checkov security scan..."; \
-		checkov -d . --framework terraform --skip-check CKV_TF_1,CKV_AWS_130 --quiet || (echo "ERROR: checkov security scan failed" && exit 1); \
-	else \
-		echo "⚠ checkov not found (optional - install with: pip install checkov)"; \
-	fi
-	@echo "Running Terraform plan..."
-	@terraform plan -out=main.plan || (echo "ERROR: Terraform plan failed" && exit 1)
-	@echo ""
-	@echo "✓ All pre-commit checks passed!"
+test: check-env init ## Run full test suite (validate, fmt, lint, plan)
+	@./test/test.sh
+
+pr: init ## Run pre-commit checks (validate, fmt, lint - skips plan)
+	@./test/pr.sh
