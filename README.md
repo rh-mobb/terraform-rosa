@@ -81,7 +81,9 @@ make test
 
 Optional linting tools (recommended):
 - **tflint**: Terraform linter for best practices (`brew install tflint`)
-- **checkov**: Security scanning (`pip install checkov`)
+- **checkov**: Security scanning (`pip install checkov==3.2.495`)
+
+**Note:** For consistent results, use checkov version 3.2.495 (same as CI). Different versions may report different checks.
 
 These tools are optional - both `make pr` and `make test` will use them if installed, but won't fail if they're missing.
 

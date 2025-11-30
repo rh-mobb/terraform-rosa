@@ -153,8 +153,9 @@ make hcp
   - Verify a plan can be created (`terraform plan`)
 - **Optional linting tools** (recommended but not required):
   - `tflint` - Terraform linter (install: `brew install tflint` or download from [tflint.dev](https://tflint.dev))
-  - `checkov` - Security scanning (install: `pip install checkov`)
-  - These tools are optional - `make pr` will run them if available, but won't fail if missing
+  - `checkov` - Security scanning (install: `pip install checkov==3.2.495`)
+  - **Note:** Use checkov version 3.2.495 for consistent results with CI. Different versions may report different checks.
+  - These tools are optional - both `make pr` and `make test` will run them if available, but won't fail if missing
 - Alternatively, run individual checks:
   - `terraform validate` to check syntax
   - `terraform fmt -check` to ensure formatting
