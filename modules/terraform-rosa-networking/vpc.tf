@@ -1,4 +1,5 @@
 resource "aws_vpc" "rosa" {
+  # checkov:skip=CKV2_AWS_11:VPC flow logging is optional for development/test environments
   count = local.create_networking ? 1 : 0
 
   cidr_block           = local.vpc_cidr

@@ -4,6 +4,7 @@
 
 # classic
 module "account_roles_classic" {
+  # checkov:skip=CKV_TF_1:Module version constraints are acceptable (better than commit hashes for maintainability)
   count = var.hosted_control_plane ? 0 : 1
 
   source  = "terraform-redhat/rosa-classic/rhcs//modules/account-iam-resources"
@@ -16,6 +17,7 @@ module "account_roles_classic" {
 
 # hosted control plane
 module "account_roles_hcp" {
+  # checkov:skip=CKV_TF_1:Module version constraints are acceptable (better than commit hashes for maintainability)
   count = var.hosted_control_plane ? 1 : 0
 
   source  = "terraform-redhat/rosa-hcp/rhcs//modules/account-iam-resources"
@@ -31,6 +33,7 @@ module "account_roles_hcp" {
 
 # classic
 module "oidc_config_and_provider_classic" {
+  # checkov:skip=CKV_TF_1:Module version constraints are acceptable (better than commit hashes for maintainability)
   count = var.hosted_control_plane ? 0 : 1
 
   source  = "terraform-redhat/rosa-classic/rhcs//modules/oidc-config-and-provider"
@@ -40,7 +43,9 @@ module "oidc_config_and_provider_classic" {
   tags    = var.tags
 }
 
+# checkov:skip=CKV_TF_1:Module version constraints are acceptable (better than commit hashes for maintainability)
 module "operator_policies_classic" {
+  # checkov:skip=CKV_TF_1:Module version constraints are acceptable (better than commit hashes for maintainability)
   count = var.hosted_control_plane ? 0 : 1
 
   source  = "terraform-redhat/rosa-classic/rhcs//modules/operator-policies"
@@ -51,7 +56,9 @@ module "operator_policies_classic" {
   tags                = var.tags
 }
 
+# checkov:skip=CKV_TF_1:Module version constraints are acceptable (better than commit hashes for maintainability)
 module "operator_roles_classic" {
+  # checkov:skip=CKV_TF_1:Module version constraints are acceptable (better than commit hashes for maintainability)
   count = var.hosted_control_plane ? 0 : 1
 
   source  = "terraform-redhat/rosa-classic/rhcs//modules/operator-roles"
@@ -66,6 +73,7 @@ module "operator_roles_classic" {
 
 # hosted control plane
 module "oidc_config_and_provider_hcp" {
+  # checkov:skip=CKV_TF_1:Module version constraints are acceptable (better than commit hashes for maintainability)
   count = var.hosted_control_plane ? 1 : 0
 
   source  = "terraform-redhat/rosa-hcp/rhcs//modules/oidc-config-and-provider"
@@ -75,7 +83,9 @@ module "oidc_config_and_provider_hcp" {
   tags    = var.tags
 }
 
+# checkov:skip=CKV_TF_1:Module version constraints are acceptable (better than commit hashes for maintainability)
 module "operator_roles_hcp" {
+  # checkov:skip=CKV_TF_1:Module version constraints are acceptable (better than commit hashes for maintainability)
   count = var.hosted_control_plane ? 1 : 0
 
   source  = "terraform-redhat/rosa-hcp/rhcs//modules/operator-roles"

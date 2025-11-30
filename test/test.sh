@@ -23,7 +23,7 @@ fi
 
 if command -v checkov >/dev/null 2>&1; then
     echo "Running checkov security scan..."
-    checkov -d . --framework terraform --skip-check CKV_TF_1,CKV_AWS_130 --quiet || {
+    checkov -d . --framework terraform --quiet || {
         echo "ERROR: checkov security scan failed" >&2
         exit 1
     }

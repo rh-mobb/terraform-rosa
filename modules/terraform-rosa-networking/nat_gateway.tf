@@ -1,4 +1,5 @@
 resource "aws_eip" "rosa_nat_gateway" {
+  # checkov:skip=CKV2_AWS_19:EIP is correctly attached to NAT gateway (not EC2, but that's valid usage)
   count = local.public_subnet_count
 
   tags = merge(var.tags,
