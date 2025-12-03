@@ -1,0 +1,85 @@
+name: Pre-commit Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+  push:
+    branches:
+      - main
+      - master
+
+env:
+  TF_VAR_admin_password: "DummyPassword123!"
+  TF_VAR_cluster_name: "test-cluster"
+  TF_VAR_token: "dummy-token-for-validation-only"
+
+jobs:
+  pr-checks:
+    name: Run pre-commit checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.12.2"
+          terraform_wrapper: false
+
+      - name: Setup tflint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: "latest"
+
+      - name: Setup checkov (optional)
+        run: |
+          pip install checkov==3.2.495 || echo "checkov installation failed, continuing without it"
+
+      - name: Cache Terraform providers
+        uses: actions/cache@v4
+        with:
+          path: |
+            .terraform
+            .terraform.lock.hcl
+          key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf', '**/*.tfvars') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
+
+      - name: Run pre-commit checks
+        run: make pr
+        continue-on-error: false
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let comment = '## Pre-commit Checks\n\n';
+
+            // Check if make pr succeeded
+            if ('${{ job.status }}' === 'success') {
+              comment += '✅ All pre-commit checks passed!\n\n';
+              comment += '- ✅ Terraform validate\n';
+              comment += '- ✅ Terraform fmt\n';
+              comment += '- ✅ tflint\n';
+              comment += '- ✅ checkov (if installed)\n\n';
+              comment += '**Note:** Plan step is skipped in CI. Run `make test` locally for full test suite including plan.';
+            } else {
+              comment += '❌ Pre-commit checks failed. Please review the logs above.\n\n';
+              comment += 'Run `make pr` locally to see detailed errors.';
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

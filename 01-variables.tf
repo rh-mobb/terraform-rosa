@@ -47,19 +47,6 @@ variable "hosted_control_plane" {
   default     = false
 }
 
-variable "autoscaling" {
-  description = <<EOF
-  Enable autoscaling for the default machine pool, this is ignored for HCP clusters as autoscaling is not supported
-  for Hosted Control Plane clusters at this time.
-
-  WARN: this variable is deprecated.  Simply setting 'max_replicas' will enable autoscaling.  This will be removed
-  in a future version of this module.
-  EOF
-  type        = bool
-  nullable    = true
-  default     = null
-}
-
 variable "replicas" {
   description = <<EOF
   Minimum number of replicas for the default machine pool.  If unset, a default value is configured based on the
@@ -72,8 +59,8 @@ variable "replicas" {
 
 variable "max_replicas" {
   description = <<EOF
-  Maximum number of replicas for the default machine pool.  If set, autoscaling is enabled.  If 
-  'hosted_control_plane' is also set to true, understand that 'max_replicas' is for each subnet.  For example, if 
+  Maximum number of replicas for the default machine pool.  If set, autoscaling is enabled.  If
+  'hosted_control_plane' is also set to true, understand that 'max_replicas' is for each subnet.  For example, if
   you use 'multi_az' (3 subnets) and set a 'max_replicas' value of 3.  You could end up with 9 total replicas, 3 per
   subnet.
   EOF
@@ -182,4 +169,15 @@ variable "fips" {
   EOF
   type        = bool
   default     = false
+}
+
+variable "deploy_gitops" {
+  description = "Deploy the GitOps operator after cluster creation. Note: Cannot be used with private clusters."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.deploy_gitops || !var.private
+    error_message = "GitOps deployment is not supported for private clusters. Set 'private=false' or 'deploy_gitops=false'."
+  }
 }

@@ -1,4 +1,5 @@
 resource "aws_subnet" "rosa_public" {
+  # checkov:skip=CKV_AWS_130:Public subnets intentionally have map_public_ip_on_launch = true
   count = local.public_subnet_count
 
   vpc_id                  = aws_vpc.rosa[0].id

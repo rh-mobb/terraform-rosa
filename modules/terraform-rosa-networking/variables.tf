@@ -1,7 +1,6 @@
 variable "cluster_name" {
   description = "Name of the cluster to create"
   type        = string
-  default     = "dscott"
 }
 
 # TODO: no validation on this input currently

@@ -1,0 +1,13 @@
+# Cursor Rules for Terraform ROSA Project
+
+Please refer to [AGENTS.md](AGENTS.md) for complete project guidelines, conventions, and best practices.
+
+Key points:
+- Files use numeric prefixes: 00-19 (infrastructure), 20 (cluster access), 21-29 (workloads), 90-99 (outputs)
+- Use Makefile targets for common operations (see `make help`)
+- Shell variables in provisioners use single `$` (Terraform only interpolates `${...}`)
+- Private clusters cannot use cluster login or GitOps deployment
+- Default to HCP clusters (`TF_VAR_hosted_control_plane=true` by default)
+- **Before committing**: Run `make pr` to validate, check formatting, and run linting (or `make test` for full suite including plan)
+
+See AGENTS.md for detailed documentation.
