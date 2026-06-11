@@ -129,11 +129,17 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   version              = local.hcp_version
   sts                  = local.sts_roles
 
+  # karpenter (autonode) — only set when var.karpenter is true; null disables the feature
+  auto_node = var.karpenter ? {
+    mode     = "enabled"
+    role_arn = aws_iam_role.karpenter[0].arn
+  } : null
+
   disable_waiting_in_destroy          = false
   wait_for_create_complete            = true
   wait_for_std_compute_nodes_complete = true
 
-  depends_on = [module.network, module.account_roles_hcp, module.operator_roles_hcp]
+  depends_on = [module.network, module.account_roles_hcp, module.operator_roles_hcp, aws_iam_role.karpenter]
 }
 
 # see https://registry.terraform.io/providers/terraform-redhat/rhcs/latest/docs/guides/worker-machine-pool for background

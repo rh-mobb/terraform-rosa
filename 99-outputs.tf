@@ -82,3 +82,8 @@ output "bastion_connectivity" {
   description = "Instructions for connecting to the bastion host (only set for private clusters)"
   value       = local.bastion_output
 }
+
+output "karpenter_role_arn" {
+  description = "The ARN of the Karpenter IAM role (only set when karpenter = true)"
+  value       = var.hosted_control_plane && var.karpenter ? aws_iam_role.karpenter[0].arn : null
+}

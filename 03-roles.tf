@@ -127,4 +127,113 @@ locals {
     oidc_config_id       = local.oidc_config_id
     oidc_endpoint_url    = local.oidc_endpoint_url
   }
+
+  # karpenter
+  #   NOTE: the OIDC endpoint URL may include an "https://" prefix depending on the module version — trimprefix
+  #         ensures the condition variable and federated identifier are always in the bare hostname/path format
+  #         expected by AWS IAM (e.g. "oidc.op1.openshiftapps.com/<id>").
+  karpenter_oidc_url = trimprefix(local.oidc_endpoint_url, "https://")
+}
+
+#
+# karpenter (autonode) iam role
+#   NOTE: only created when both hosted_control_plane and karpenter are true.
+#
+
+data "aws_iam_policy_document" "karpenter_trust" {
+  # checkov:skip=CKV_TF_1:Module version constraints are acceptable (better than commit hashes for maintainability)
+  count = var.hosted_control_plane && var.karpenter ? 1 : 0
+
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = ["arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${local.karpenter_oidc_url}"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${local.karpenter_oidc_url}:sub"
+      values   = ["system:serviceaccount:kube-system:karpenter"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${local.karpenter_oidc_url}:aud"
+      values   = ["openshift"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "karpenter_policy" {
+  count = var.hosted_control_plane && var.karpenter ? 1 : 0
+
+  statement {
+    sid    = "KarpenterEC2"
+    effect = "Allow"
+    actions = [
+      "ec2:CreateFleet",
+      "ec2:CreateLaunchTemplate",
+      "ec2:CreateTags",
+      "ec2:DeleteLaunchTemplate",
+      "ec2:DescribeAvailabilityZones",
+      "ec2:DescribeImages",
+      "ec2:DescribeInstances",
+      "ec2:DescribeInstanceTypeOfferings",
+      "ec2:DescribeInstanceTypes",
+      "ec2:DescribeLaunchTemplates",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeSpotPriceHistory",
+      "ec2:DescribeSubnets",
+      "ec2:RunInstances",
+      "ec2:TerminateInstances",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid     = "KarpenterPassRole"
+    effect  = "Allow"
+    actions = ["iam:PassRole"]
+    # allow karpenter to assign the worker role to nodes it provisions
+    resources = [local.worker_role_arn]
+  }
+
+  statement {
+    sid    = "KarpenterSQS"
+    effect = "Allow"
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+      "sqs:ReceiveMessage",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "KarpenterPricing"
+    effect    = "Allow"
+    actions   = ["pricing:GetProducts"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "karpenter" {
+  # checkov:skip=CKV_AWS_274:Karpenter requires broad EC2 permissions for dynamic node provisioning
+  count = var.hosted_control_plane && var.karpenter ? 1 : 0
+
+  name               = "${var.cluster_name}-karpenter"
+  assume_role_policy = data.aws_iam_policy_document.karpenter_trust[0].json
+  tags               = var.tags
+}
+
+resource "aws_iam_role_policy" "karpenter" {
+  count = var.hosted_control_plane && var.karpenter ? 1 : 0
+
+  name   = "${var.cluster_name}-karpenter"
+  role   = aws_iam_role.karpenter[0].id
+  policy = data.aws_iam_policy_document.karpenter_policy[0].json
 }

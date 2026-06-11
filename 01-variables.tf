@@ -181,3 +181,18 @@ variable "deploy_gitops" {
     error_message = "GitOps deployment is not supported for private clusters. Set 'private=false' or 'deploy_gitops=false'."
   }
 }
+
+variable "karpenter" {
+  description = <<EOF
+  Enable Red Hat build of Karpenter (AutoNode) for automatic, workload-aware node provisioning on ROSA HCP clusters.
+  When enabled, Karpenter replaces static machine pools with dynamic, right-sized EC2 instances based on actual pod
+  resource requests.  Requires 'hosted_control_plane = true'.
+  EOF
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.karpenter || var.hosted_control_plane
+    error_message = "Karpenter (AutoNode) is only supported with 'hosted_control_plane = true'."
+  }
+}
