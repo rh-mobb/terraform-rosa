@@ -18,10 +18,7 @@ apiVersion: karpenter.hypershift.openshift.io/v1
 kind: OpenshiftEC2NodeClass
 metadata:
   name: default
-spec:
-  # Subnet and security group selectors are optional — ROSA AutoNode populates
-  # them automatically using karpenter.sh/discovery and cluster ID tags.
-  # Omitting them here lets ROSA manage the correct selectors automatically.
+spec: {}
 EOF
       echo "OpenshiftEC2NodeClass applied successfully"
     EOT
