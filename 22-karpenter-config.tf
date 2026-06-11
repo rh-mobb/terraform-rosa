@@ -1,8 +1,8 @@
 # Apply the default Karpenter EC2NodeClass and NodePool to the cluster via oc CLI.
-# Only runs for public HCP clusters — private clusters require manual application
-# of these manifests after cluster creation.
+# For private clusters, Terraform must have network access to the cluster API — either
+# by running from within the VPC, or by routing through the bastion with sshuttle.
 resource "terraform_data" "karpenter_ec2nodeclass" {
-  count = var.karpenter && var.hosted_control_plane && !var.private ? 1 : 0
+  count = var.karpenter && var.hosted_control_plane ? 1 : 0
 
   triggers_replace = {
     cluster_id   = local.cluster_id
@@ -43,7 +43,7 @@ EOF
 }
 
 resource "terraform_data" "karpenter_nodepool" {
-  count = var.karpenter && var.hosted_control_plane && !var.private ? 1 : 0
+  count = var.karpenter && var.hosted_control_plane ? 1 : 0
 
   triggers_replace = {
     cluster_id   = local.cluster_id

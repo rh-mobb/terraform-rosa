@@ -121,7 +121,9 @@ terraform output karpenter_role_arn
 
 **Default NodePool and EC2NodeClass — automatically applied:**
 
-For public clusters, Terraform automatically applies a default `EC2NodeClass` and `NodePool` to the cluster after it is ready (via `22-karpenter-config.tf`, following the same pattern used for GitOps). No manual steps are required.
+Terraform automatically applies a default `EC2NodeClass` and `NodePool` to the cluster after it is ready (via `22-karpenter-config.tf`, following the same pattern used for GitOps). No manual steps are required.
+
+For private clusters, Terraform must have network access to the cluster API to apply these manifests. Run Terraform from within the VPC, or use sshuttle through the bastion host before applying.
 
 The defaults configure Karpenter to:
 - Use the ROSA-managed AMI (`custom@latest`)
@@ -131,7 +133,7 @@ The defaults configure Karpenter to:
 - Consolidate underutilized nodes after 30 seconds
 - Cap total provisioned capacity at 1000 CPU cores
 
-**For private clusters**, Terraform cannot reach the cluster API to apply manifests. Apply the following manually after cluster creation:
+**Customizing the defaults** — if you need different instance families, capacity types, or consolidation behavior, modify the manifests directly after creation or replace the `default` NodePool/EC2NodeClass with your own. The manifest below shows the defaults applied by Terraform as a reference:
 
 ```yaml
 apiVersion: karpenter.k8s.aws/v1
@@ -228,7 +230,7 @@ This repository uses a numbered prefix system for Terraform files to ensure they
 
 - **21-29: Workload Installation**
   - `21-gitops.tf` - GitOps operator deployment (optional)
-  - `22-karpenter-config.tf` - Karpenter EC2NodeClass and NodePool (optional, public clusters only)
+  - `22-karpenter-config.tf` - Karpenter EC2NodeClass and NodePool (optional, requires cluster API access)
 
 - **90-99: Final Steps**
   - `99-outputs.tf` - Output values

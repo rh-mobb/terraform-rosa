@@ -1,7 +1,9 @@
 # Local variable to determine if cluster login should be performed.
-# Login is needed when deploying GitOps or configuring Karpenter on a public cluster.
+# Login is needed when deploying GitOps or configuring Karpenter NodePool/EC2NodeClass.
+# For private clusters, Terraform must have network access to the cluster API — either
+# by running from within the VPC, or by routing through the bastion with sshuttle.
 locals {
-  should_perform_cluster_login = (var.deploy_gitops || (var.karpenter && var.hosted_control_plane)) && !var.private
+  should_perform_cluster_login = var.deploy_gitops || (var.karpenter && var.hosted_control_plane)
 }
 
 # Validate that cluster login requirements are met
@@ -9,13 +11,6 @@ check "cluster_login_requirements" {
   assert {
     condition     = !var.deploy_gitops || !var.private
     error_message = "Cluster login is required for GitOps deployment but is not supported for private clusters. Set 'private=false' or 'deploy_gitops=false'."
-  }
-}
-
-check "karpenter_login_requirements" {
-  assert {
-    condition     = !(var.karpenter && var.private)
-    error_message = "Karpenter NodePool/EC2NodeClass configuration requires cluster access, which is not supported for private clusters. Apply the manifests manually after cluster creation."
   }
 }
 
