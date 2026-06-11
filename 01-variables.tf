@@ -76,6 +76,24 @@ variable "token" {
   EOF
   type        = string
   sensitive   = true
+  default     = null
+  nullable    = true
+}
+
+variable "client_id" {
+  description = "OCM client ID for service account authentication. If unset, defaults to 'cloud-services' (or 'console-dot' for GovCloud)."
+  type        = string
+  sensitive   = true
+  default     = null
+  nullable    = true
+}
+
+variable "client_secret" {
+  description = "OCM client secret for service account authentication. If unset, uses an empty string (default client secret)."
+  type        = string
+  sensitive   = true
+  default     = null
+  nullable    = true
 }
 
 variable "cluster_name" {
