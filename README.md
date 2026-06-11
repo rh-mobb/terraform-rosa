@@ -9,6 +9,7 @@ or [Hosted Control Plane](https://docs.openshift.com/rosa/architecture/rosa-arch
 - Local HTPasswd [identity provider](https://docs.openshift.com/rosa/authentication/sd-configuring-identity-providers.html) with an "admin" user with Cluster Admin privileges
 - Local HTPasswd [identity provider](https://docs.openshift.com/rosa/authentication/sd-configuring-identity-providers.html) with an "developer" user with basic privileges
 - Optional GitOps operator deployment (OpenShift GitOps) after cluster creation
+- Optional [Red Hat build of Karpenter (AutoNode)](https://docs.redhat.com/en/documentation/red_hat_openshift_service_on_aws/4/html/cluster_administration/rosa-hcp-autonode) for workload-aware, right-sized node provisioning (ROSA HCP only)
 
 
 # Usage
@@ -66,6 +67,113 @@ terraform init
 terraform plan -out=rosa.plan
 terraform apply rosa.plan
 ```
+
+## Karpenter (AutoNode)
+
+[Red Hat build of Karpenter](https://docs.redhat.com/en/documentation/red_hat_openshift_service_on_aws/4/html/cluster_administration/rosa-hcp-autonode) replaces static machine pools with dynamic, workload-aware node provisioning. Instead of pre-defining instance types and scaling thresholds, Karpenter evaluates the actual CPU, memory, and scheduling constraints of pending pods and provisions the optimal EC2 instance just-in-time — then continuously consolidates underutilized nodes.
+
+**Requirements:**
+- ROSA HCP cluster (`hosted_control_plane = true`)
+- OpenShift 4.22 or later
+- Karpenter runs in the hosted control plane — no pods are added to your worker nodes
+
+**How to enable:**
+
+Set `karpenter = true` in your module configuration or `terraform.tfvars`:
+
+```hcl
+module "rosa_hcp_karpenter" {
+  source = "git::https://github.com/rh-mobb/terraform-rosa.git?ref=main"
+
+  hosted_control_plane = true
+  karpenter            = true
+  cluster_name         = "my-karpenter-cluster"
+  ocp_version          = "4.22.0"
+  replicas             = 3        # must be a multiple of 3 for multi_az
+  multi_az             = true
+  token                = var.token
+  admin_password       = var.admin_password
+  developer_password   = var.developer_password
+}
+```
+
+Or via environment variable:
+
+```bash
+export TF_VAR_karpenter=true
+```
+
+**What Terraform creates when `karpenter = true`:**
+
+| Resource | Name | Purpose |
+|---|---|---|
+| `aws_iam_role` | `<cluster_name>-karpenter` | Karpenter controller role, trusted via OIDC |
+| `aws_iam_role_policy` | `<cluster_name>-karpenter` | EC2, SQS, pricing, and PassRole permissions |
+
+The cluster's `auto_node` attribute is set automatically — no additional configuration is required after `terraform apply`.
+
+**Output:**
+
+```bash
+terraform output karpenter_role_arn
+# arn:aws:iam::<account>:role/<cluster_name>-karpenter
+```
+
+**After the cluster is ready**, configure a `NodePool` and `EC2NodeClass` to tell Karpenter what nodes it can provision:
+
+```yaml
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: default
+spec:
+  amiSelectorTerms:
+    - alias: custom@latest
+  subnetSelectorTerms:
+    - tags:
+        kubernetes.io/cluster/<cluster_name>: shared
+  securityGroupSelectorTerms:
+    - tags:
+        kubernetes.io/cluster/<cluster_name>: owned
+  role: <cluster_name>-HCP-ROSA-Worker-Role
+---
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: default
+spec:
+  template:
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: default
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64", "arm64"]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["spot", "on-demand"]
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: ["c", "m", "r"]
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values: ["5"]
+  limits:
+    cpu: 1000
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 30s
+```
+
+```bash
+oc apply -f ec2nodeclass.yaml
+oc apply -f nodepool.yaml
+```
+
+**Note:** Karpenter coexists with Cluster Autoscaler and manually managed machine pools. Use node selectors or taints/tolerations to direct specific workloads to Karpenter-managed nodes.
 
 **Before committing code**, run the pre-commit checks:
 
@@ -145,7 +253,14 @@ TF_VAR_deploy_gitops=true make cluster
 Required environment variables:
 - `TF_VAR_admin_password` - Password for the admin user
 - `TF_VAR_cluster_name` - Name of the cluster
-- `TF_VAR_token` - OCM token for authentication
+- `TF_VAR_token` - OCM offline token for authentication (from [console.redhat.com/openshift/token](https://console.redhat.com/openshift/token))
+
+Alternatively, authenticate using a service account with client credentials instead of an offline token:
+- `TF_VAR_client_id` - OCM service account client ID
+- `TF_VAR_client_secret` - OCM service account client secret
+
+Optional environment variables:
+- `TF_VAR_karpenter=true` - Enable Karpenter (AutoNode) for ROSA HCP clusters
 
 ## Versioning
 
