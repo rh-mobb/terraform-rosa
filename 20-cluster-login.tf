@@ -107,15 +107,13 @@ resource "terraform_data" "cluster_login" {
     command = <<-EOT
       set -e
 
-      # Wait a bit for identity provider to be fully ready
-      echo "Waiting for identity provider to be ready..."
-      sleep 30
-
-      # Retry login with exponential backoff
-      echo "Logging into cluster ${local.cluster_name}..."
-      max_attempts=5
-      attempt=1
-      while [ $attempt -le $max_attempts ]; do
+      # Poll until the HTPasswd IDP is fully synced and login succeeds.
+      # HCP clusters can take several minutes for the OAuth server to pick up
+      # a new IDP after the cluster reaches ready state.
+      echo "Waiting for identity provider to sync (up to 10 minutes)..."
+      idp_timeout=600
+      idp_elapsed=0
+      while [ $idp_elapsed -lt $idp_timeout ]; do
         if oc login ${local.cluster_api_url} \
           --username ${local.admin_username} \
           --password ${var.admin_password} \
@@ -123,17 +121,13 @@ resource "terraform_data" "cluster_login" {
           echo "Cluster login successful!"
           exit 0
         fi
-
-        if [ $attempt -eq $max_attempts ]; then
-          echo "ERROR: Failed to login after $max_attempts attempts"
-          echo "This may indicate the identity provider is not ready or credentials are incorrect"
-          exit 1
-        fi
-
-        echo "Login attempt $attempt failed, retrying in $((attempt * 10)) seconds..."
-        sleep $((attempt * 10))
-        attempt=$((attempt + 1))
+        echo "IDP not ready yet, retrying... ($idp_elapsed s / $idp_timeout s)"
+        sleep 15
+        idp_elapsed=$((idp_elapsed + 15))
       done
+
+      echo "ERROR: Failed to login after $idp_timeout s - IDP may not have synced or credentials are incorrect"
+      exit 1
     EOT
   }
 

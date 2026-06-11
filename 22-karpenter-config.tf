@@ -19,10 +19,8 @@ kind: EC2NodeClass
 metadata:
   name: default
 spec:
-  # Use the ROSA-managed AMI — always pinned to the approved OpenShift node image
-  amiSelectorTerms:
-    - alias: custom@latest
   # Target the private subnets created by this module
+  # NOTE: amiSelectorTerms is omitted — ROSA AutoNode manages AMI selection automatically
   subnetSelectorTerms:
     - tags:
         kubernetes.io/cluster/${local.cluster_name}: shared
