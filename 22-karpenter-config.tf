@@ -19,15 +19,9 @@ kind: OpenshiftEC2NodeClass
 metadata:
   name: default
 spec:
-  # Target the private subnets created by this module
-  subnetSelectorTerms:
-    - tags:
-        kubernetes.io/cluster/${local.cluster_name}: shared
-  # Use the cluster security groups
-  securityGroupSelectorTerms:
-    - tags:
-        kubernetes.io/cluster/${local.cluster_name}: owned
-  # NOTE: role and amiSelectorTerms are omitted — ROSA AutoNode manages these automatically
+  # Subnet and security group selectors are optional — ROSA AutoNode populates
+  # them automatically using karpenter.sh/discovery and cluster ID tags.
+  # Omitting them here lets ROSA manage the correct selectors automatically.
 EOF
       echo "OpenshiftEC2NodeClass applied successfully"
     EOT
@@ -57,10 +51,15 @@ metadata:
   name: default
 spec:
   template:
+    metadata:
+      labels:
+        autonode: "true"
     spec:
+      # nodeClassRef must point to karpenter.k8s.aws/EC2NodeClass — ROSA creates this
+      # automatically from the OpenshiftEC2NodeClass via a sync controller.
       nodeClassRef:
-        group: karpenter.hypershift.openshift.io
-        kind: OpenshiftEC2NodeClass
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
         name: default
       requirements:
         - key: kubernetes.io/arch

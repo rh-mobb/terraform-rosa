@@ -136,18 +136,12 @@ The defaults configure Karpenter to:
 **Customizing the defaults** — if you need different instance families, capacity types, or consolidation behavior, modify the manifests directly after creation or replace the `default` NodePool/EC2NodeClass with your own. The manifest below shows the defaults applied by Terraform as a reference:
 
 ```yaml
+# ROSA manages subnet/SG selectors automatically via karpenter.sh/discovery tags
 apiVersion: karpenter.hypershift.openshift.io/v1
 kind: OpenshiftEC2NodeClass
 metadata:
   name: default
-spec:
-  subnetSelectorTerms:
-    - tags:
-        kubernetes.io/cluster/<cluster_name>: shared
-  securityGroupSelectorTerms:
-    - tags:
-        kubernetes.io/cluster/<cluster_name>: owned
-  # role and amiSelectorTerms are managed automatically by ROSA AutoNode
+spec: {}
 ---
 apiVersion: karpenter.sh/v1
 kind: NodePool
@@ -155,10 +149,14 @@ metadata:
   name: default
 spec:
   template:
+    metadata:
+      labels:
+        autonode: "true"
     spec:
+      # Reference the upstream EC2NodeClass — ROSA syncs OpenshiftEC2NodeClass → EC2NodeClass
       nodeClassRef:
-        group: karpenter.hypershift.openshift.io
-        kind: OpenshiftEC2NodeClass
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
         name: default
       requirements:
         - key: kubernetes.io/arch
