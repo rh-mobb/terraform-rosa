@@ -14,13 +14,12 @@ resource "terraform_data" "karpenter_ec2nodeclass" {
       set -e
       echo "Applying default Karpenter EC2NodeClass..."
       cat <<EOF | oc apply -f -
-apiVersion: karpenter.k8s.aws/v1
-kind: EC2NodeClass
+apiVersion: karpenter.hypershift.openshift.io/v1
+kind: OpenshiftEC2NodeClass
 metadata:
   name: default
 spec:
   # Target the private subnets created by this module
-  # NOTE: amiSelectorTerms is omitted — ROSA AutoNode manages AMI selection automatically
   subnetSelectorTerms:
     - tags:
         kubernetes.io/cluster/${local.cluster_name}: shared
@@ -28,10 +27,9 @@ spec:
   securityGroupSelectorTerms:
     - tags:
         kubernetes.io/cluster/${local.cluster_name}: owned
-  # IAM role assigned to Karpenter-provisioned nodes
-  role: ${local.cluster_name}-HCP-ROSA-Worker-Role
+  # NOTE: role and amiSelectorTerms are omitted — ROSA AutoNode manages these automatically
 EOF
-      echo "EC2NodeClass applied successfully"
+      echo "OpenshiftEC2NodeClass applied successfully"
     EOT
   }
 
@@ -61,8 +59,8 @@ spec:
   template:
     spec:
       nodeClassRef:
-        group: karpenter.k8s.aws
-        kind: EC2NodeClass
+        group: karpenter.hypershift.openshift.io
+        kind: OpenshiftEC2NodeClass
         name: default
       requirements:
         - key: kubernetes.io/arch
