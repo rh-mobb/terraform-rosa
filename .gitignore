@@ -9,3 +9,4 @@
 main.plan
 .terraform.tfstate.lock.info
 .history/
+terraform.tfvars

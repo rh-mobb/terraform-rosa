@@ -1,6 +1,10 @@
 # Apply the default Karpenter EC2NodeClass and NodePool to the cluster via oc CLI.
 # For private clusters, Terraform must have network access to the cluster API — either
 # by running from within the VPC, or by routing through the bastion with sshuttle.
+#
+# NOTE: The Karpenter service account is automatically configured by the ROSA platform
+# when auto_node.role_arn is set in the cluster resource (04-cluster.tf). Manual service
+# account annotation is not required per Red Hat's official documentation.
 resource "terraform_data" "karpenter_ec2nodeclass" {
   count = var.karpenter && var.hosted_control_plane ? 1 : 0
 
