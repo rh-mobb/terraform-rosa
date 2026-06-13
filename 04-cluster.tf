@@ -129,11 +129,17 @@ resource "rhcs_cluster_rosa_hcp" "rosa" {
   version              = local.hcp_version
   sts                  = local.sts_roles
 
+  # karpenter (autonode) — only set when var.karpenter is true; null disables the feature
+  auto_node = var.karpenter ? {
+    mode     = "enabled"
+    role_arn = aws_iam_role.karpenter[0].arn
+  } : null
+
   disable_waiting_in_destroy          = false
   wait_for_create_complete            = true
   wait_for_std_compute_nodes_complete = true
 
-  depends_on = [module.network, module.account_roles_hcp, module.operator_roles_hcp]
+  depends_on = [module.network, module.account_roles_hcp, module.operator_roles_hcp, aws_iam_role.karpenter]
 }
 
 # see https://registry.terraform.io/providers/terraform-redhat/rhcs/latest/docs/guides/worker-machine-pool for background
@@ -147,11 +153,11 @@ data "rhcs_hcp_machine_pool" "default" {
 resource "rhcs_hcp_machine_pool" "default" {
   count = var.hosted_control_plane ? length(data.rhcs_hcp_machine_pool.default) : 0
 
-  name        = data.rhcs_hcp_machine_pool.default[count.index].name
-  cluster     = rhcs_cluster_rosa_hcp.rosa[0].id
-  subnet_id   = data.rhcs_hcp_machine_pool.default[count.index].subnet_id
-  auto_repair = data.rhcs_hcp_machine_pool.default[count.index].auto_repair
-
+  name                  = data.rhcs_hcp_machine_pool.default[count.index].name
+  cluster               = rhcs_cluster_rosa_hcp.rosa[0].id
+  subnet_id             = data.rhcs_hcp_machine_pool.default[count.index].subnet_id
+  auto_repair           = data.rhcs_hcp_machine_pool.default[count.index].auto_repair
+  ignore_deletion_error = true
   # NOTE: if autoscaling is specified via the max_replicas variable, set replicas to null as the API will reject
   #       setting both replicas and autoscaling.*_replicas
   replicas = local.autoscaling ? null : data.rhcs_hcp_machine_pool.default[count.index].replicas

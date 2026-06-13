@@ -17,8 +17,8 @@ provider "rhcs" {
   token         = var.token
   url           = var.govcloud ? "https://api.openshiftusgov.com" : "https://api.openshift.com"
   token_url     = var.govcloud ? "https://sso.openshiftusgov.com/auth/realms/redhat-external/protocol/openid-connect/token" : "https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token"
-  client_id     = var.govcloud ? "console-dot" : "cloud-services"
-  client_secret = "" # Empty string uses default client secret
+  client_id     = var.client_id != null ? var.client_id : var.govcloud ? "console-dot" : "cloud-services"
+  client_secret = var.client_secret != null ? var.client_secret : ""
 }
 
 provider "aws" {

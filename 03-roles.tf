@@ -127,4 +127,63 @@ locals {
     oidc_config_id       = local.oidc_config_id
     oidc_endpoint_url    = local.oidc_endpoint_url
   }
+
+  # karpenter
+  #   NOTE: the OIDC endpoint URL may include an "https://" prefix depending on the module version — trimprefix
+  #         ensures the condition variable and federated identifier are always in the bare hostname/path format
+  #         expected by AWS IAM (e.g. "oidc.op1.openshiftapps.com/<id>").
+  karpenter_oidc_url = trimprefix(local.oidc_endpoint_url, "https://")
+}
+
+#
+# karpenter (autonode) iam role
+#   NOTE: only created when both hosted_control_plane and karpenter are true.
+#
+
+data "aws_iam_policy_document" "karpenter_trust" {
+  count = var.hosted_control_plane && var.karpenter ? 1 : 0
+
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = ["arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${local.karpenter_oidc_url}"]
+    }
+
+    # Only sub condition — no aud condition per official Red Hat documentation
+    condition {
+      test     = "StringEquals"
+      variable = "${local.karpenter_oidc_url}:sub"
+      values   = ["system:serviceaccount:kube-system:karpenter"]
+    }
+  }
+}
+
+# Official Red Hat Karpenter IAM policy sourced from managed-cluster-config.
+# Uses resource-tag conditions (red-hat-managed) to scope EC2 actions to only
+# nodes provisioned by Karpenter.
+resource "aws_iam_policy" "karpenter" {
+  # checkov:skip=CKV_AWS_274:Karpenter requires broad read permissions for EC2 resource discovery
+  count = var.hosted_control_plane && var.karpenter ? 1 : 0
+
+  name   = "${var.cluster_name}-karpenter"
+  policy = file("${path.module}/karpenter-policy.json")
+  tags   = var.tags
+}
+
+resource "aws_iam_role" "karpenter" {
+  count = var.hosted_control_plane && var.karpenter ? 1 : 0
+
+  name               = "${var.cluster_name}-karpenter"
+  assume_role_policy = data.aws_iam_policy_document.karpenter_trust[0].json
+  tags               = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "karpenter" {
+  count = var.hosted_control_plane && var.karpenter ? 1 : 0
+
+  role       = aws_iam_role.karpenter[0].name
+  policy_arn = aws_iam_policy.karpenter[0].arn
 }
