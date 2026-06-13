@@ -153,10 +153,10 @@ data "rhcs_hcp_machine_pool" "default" {
 resource "rhcs_hcp_machine_pool" "default" {
   count = var.hosted_control_plane ? length(data.rhcs_hcp_machine_pool.default) : 0
 
-  name        = data.rhcs_hcp_machine_pool.default[count.index].name
-  cluster     = rhcs_cluster_rosa_hcp.rosa[0].id
-  subnet_id   = data.rhcs_hcp_machine_pool.default[count.index].subnet_id
-  auto_repair = data.rhcs_hcp_machine_pool.default[count.index].auto_repair
+  name                  = data.rhcs_hcp_machine_pool.default[count.index].name
+  cluster               = rhcs_cluster_rosa_hcp.rosa[0].id
+  subnet_id             = data.rhcs_hcp_machine_pool.default[count.index].subnet_id
+  auto_repair           = data.rhcs_hcp_machine_pool.default[count.index].auto_repair
   ignore_deletion_error = true
   # NOTE: if autoscaling is specified via the max_replicas variable, set replicas to null as the API will reject
   #       setting both replicas and autoscaling.*_replicas
