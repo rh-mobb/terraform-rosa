@@ -105,14 +105,16 @@ resource "aws_security_group" "bastion_host" {
   name        = "${var.cluster_name}-bastion"
   vpc_id      = module.network.vpc_id
 
-  # SSH access - only needed if bastion_public_ip is true
-  # When using sshuttle with SSM, this ingress rule is not required
-  ingress {
-    description = "Bastion SSH Ingress"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = var.bastion_public_ip ? ["0.0.0.0/0"] : []
+  dynamic "ingress" {
+    for_each = var.bastion_public_ip ? [1] : []
+
+    content {
+      description = "Bastion SSH Ingress"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = var.bastion_cidr_blocks
+    }
   }
 
   egress {
