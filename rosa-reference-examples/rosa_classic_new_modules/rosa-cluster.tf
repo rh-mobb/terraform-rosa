@@ -27,6 +27,7 @@ resource "time_sleep" "wait_60_seconds" {
 }
 
 module "rosa-classic" {
+  #checkov:skip=CKV_TF_1: Registry module version pin is intentional for reference examples.
   source                 = "terraform-redhat/rosa-classic/rhcs"
   version                = "1.7.0"
   cluster_name           = local.cluster_name

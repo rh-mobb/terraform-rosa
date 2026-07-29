@@ -19,6 +19,7 @@ data "rhcs_policies" "all_policies" {}
 data "rhcs_versions" "all" {}
 
 module "create_account_roles" {
+  #checkov:skip=CKV_TF_1: Registry module version pin is intentional for reference examples.
   source  = "terraform-redhat/rosa-sts/aws"
   version = "0.0.15"
 

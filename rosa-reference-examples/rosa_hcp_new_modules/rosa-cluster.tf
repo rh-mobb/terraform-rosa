@@ -19,6 +19,7 @@ locals {
 }
 
 module "rosa-hcp" {
+  #checkov:skip=CKV_TF_1: Registry module version pin is intentional for reference examples.
   source                 = "terraform-redhat/rosa-hcp/rhcs"
   version                = "1.7.0"
   cluster_name           = local.cluster_name

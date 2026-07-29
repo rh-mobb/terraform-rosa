@@ -1,4 +1,5 @@
 module "vpc" {
+  #checkov:skip=CKV_TF_1: Registry module version pin is intentional for reference examples.
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.19.0"
 
@@ -19,4 +20,3 @@ module "vpc" {
 
   tags = var.additional_tags
 }
-

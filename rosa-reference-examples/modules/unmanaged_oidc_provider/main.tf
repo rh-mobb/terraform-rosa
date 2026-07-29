@@ -21,6 +21,7 @@ resource "rhcs_rosa_oidc_config_input" "oidc_input" {
 
 # Create the OIDC config resources on AWS
 module "oidc_config_input_resources" {
+  #checkov:skip=CKV_TF_1: Registry module version pin is intentional for reference examples.
   source  = "terraform-redhat/rosa-sts/aws"
   version = "0.0.15"
 
@@ -46,6 +47,7 @@ resource "rhcs_rosa_oidc_config" "oidc_config" {
 
 # Create the unmanaged OIDC provider
 module "operator_roles_and_oidc_provider" {
+  #checkov:skip=CKV_TF_1: Registry module version pin is intentional for reference examples.
   source  = "terraform-redhat/rosa-sts/aws"
   version = "0.0.15"
 
