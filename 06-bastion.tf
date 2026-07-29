@@ -137,6 +137,11 @@ resource "aws_instance" "bastion_host" {
   key_name                    = aws_key_pair.bastion_host[0].key_name
   vpc_security_group_ids      = [aws_security_group.bastion_host[0].id]
 
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
   tags = local.bastion_tags
 
   user_data = <<EOF
