@@ -19,8 +19,20 @@ variable "bastion_public_ip" {
   default     = false
 }
 
+variable "bastion_cidr_blocks" {
+  description = "CIDR blocks allowed to connect to the bastion over SSH when 'bastion_public_ip' is true."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
 variable "aws_billing_account_id" {
   description = "The AWS billing account identifier where all resources are billed. If no information is provided, the data will be retrieved from the currently connected account."
+  type        = string
+  default     = null
+}
+
+variable "aws_profile" {
+  description = "Optional AWS shared config profile to use for provisioning resources. If unset, the AWS provider uses its default credential chain."
   type        = string
   default     = null
 }
