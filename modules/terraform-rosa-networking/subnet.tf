@@ -1,6 +1,6 @@
 resource "aws_subnet" "rosa_public" {
   # checkov:skip=CKV_AWS_130:Public subnets intentionally have map_public_ip_on_launch = true
-  count = local.public_subnet_count
+  count = local.create_networking ? local.public_subnet_count : 0
 
   vpc_id                  = aws_vpc.rosa[0].id
   cidr_block              = local.subnets_public[count.index]
@@ -20,7 +20,7 @@ resource "aws_subnet" "rosa_public" {
 }
 
 resource "aws_subnet" "rosa_private" {
-  count = local.private_subnet_count
+  count = local.create_networking ? local.private_subnet_count : 0
 
   vpc_id                  = aws_vpc.rosa[0].id
   cidr_block              = local.subnets_private[count.index]

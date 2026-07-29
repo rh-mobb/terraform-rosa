@@ -129,6 +129,18 @@ variable "vpc_cidr" {
   default     = "10.10.0.0/16"
 }
 
+variable "private_subnet_ids" {
+  description = "Pre-existing private subnet IDs to use for the ROSA cluster. If set, 'public_subnet_ids' must also be set."
+  type        = list(string)
+  default     = []
+}
+
+variable "public_subnet_ids" {
+  description = "Pre-existing public subnet IDs to use for public-facing ROSA components and the bastion when 'bastion_public_ip' is true. If set, 'private_subnet_ids' must also be set."
+  type        = list(string)
+  default     = []
+}
+
 variable "subnet_cidr_size" {
   description = <<EOF
   The CIDR size of each of the individual subnets that will be created.  Must be within range of the 'vpc_cidr'

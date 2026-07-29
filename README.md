@@ -60,6 +60,19 @@ module "rosa_public" {
 }
 ```
 
+To use pre-existing networking, provide matching private and public subnet IDs
+from the same VPC:
+
+```hcl
+module "rosa_existing_network" {
+  source = "git::https://github.com/rh-mobb/terraform-rosa.git?ref=main"
+
+  cluster_name       = "my-rosa-cluster"
+  private_subnet_ids = ["subnet-0123456789abcdef0", "subnet-0123456789abcdef1", "subnet-0123456789abcdef2"]
+  public_subnet_ids  = ["subnet-0123456789abcdef3", "subnet-0123456789abcdef4", "subnet-0123456789abcdef5"]
+}
+```
+
 Once the above has been created, normal Terraform commands can be run:
 
 ```bash
