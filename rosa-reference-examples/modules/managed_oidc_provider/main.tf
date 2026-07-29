@@ -16,7 +16,7 @@
 
 # Generate managed oidc config
 resource "rhcs_rosa_oidc_config" "oidc_config" {
-  managed            = true
+  managed = true
 }
 
 data "rhcs_rosa_operator_roles" "operator_roles" {

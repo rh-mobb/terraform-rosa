@@ -33,8 +33,8 @@ module "oidc_config_input_resources" {
   private_key_file_name   = one(rhcs_rosa_oidc_config_input.oidc_input[*].private_key_file_name)
   private_key_secret_name = one(rhcs_rosa_oidc_config_input.oidc_input[*].private_key_secret_name)
 
-  tags                        = var.additional_tags
-  path                        = var.path
+  tags = var.additional_tags
+  path = var.path
 }
 
 resource "rhcs_rosa_oidc_config" "oidc_config" {
@@ -49,7 +49,7 @@ module "operator_roles_and_oidc_provider" {
   source  = "terraform-redhat/rosa-sts/aws"
   version = "0.0.15"
 
-  create_oidc_provider  = true
+  create_oidc_provider = true
 
   cluster_id                  = ""
   rh_oidc_provider_thumbprint = rhcs_rosa_oidc_config.oidc_config.thumbprint

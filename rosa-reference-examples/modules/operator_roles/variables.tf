@@ -11,20 +11,20 @@ variable "create_operator_roles" {
 }
 
 
-variable operator_role_prefix {
-    type = string
+variable "operator_role_prefix" {
+  type = string
 }
 
-variable oidc_endpoint_url {
-    type = string
+variable "oidc_endpoint_url" {
+  type = string
 }
 
-variable oidc_thumbprint {
-    type = string
+variable "oidc_thumbprint" {
+  type = string
 }
 
-variable additional_tags {
-    type = map(string)
+variable "additional_tags" {
+  type = map(string)
 }
 
 variable "path" {

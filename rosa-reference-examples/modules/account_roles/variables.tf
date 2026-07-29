@@ -51,8 +51,8 @@ variable "operator_role_policies" {
   default = null
 }
 
-variable additional_tags {
-    type = map(string)
+variable "additional_tags" {
+  type = map(string)
 }
 
 variable "path" {

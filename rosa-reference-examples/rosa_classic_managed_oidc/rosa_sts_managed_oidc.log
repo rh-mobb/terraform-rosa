@@ -1,8 +1,0 @@
-[31m╷[0m[0m
-[31m│[0m [0m[1m[31mError: [0m[0m[1mUnsupported argument[0m
-[31m│[0m [0m
-[31m│[0m [0m[0m  on main.tf line 108, in module "rosa_cluster":
-[31m│[0m [0m 108:   [4madmin_credentials[0m      = {[0m
-[31m│[0m [0m
-[31m│[0m [0mAn argument named "admin_credentials" is not expected here.
-[31m╵[0m[0m

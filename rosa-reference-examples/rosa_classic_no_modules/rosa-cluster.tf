@@ -6,9 +6,9 @@ locals {
 }
 
 resource "random_string" "random_name" {
-  length           = 6
-  special          = false
-  upper            = false
+  length  = 6
+  special = false
+  upper   = false
 }
 
 locals {
@@ -46,12 +46,12 @@ resource "rhcs_cluster_rosa_classic" "rosa_sts_cluster" {
   # Uncomment if autoscaling enabled
   #min_replicas         = var.min_replicas
   #max_replicas         = var.max_replicas
-  sts                  = local.sts_roles
+  sts = local.sts_roles
   properties = {
     rosa_creator_arn = data.aws_caller_identity.current.arn
   }
 
-  admin_credentials      = {
+  admin_credentials = {
     username = var.admin_username
     password = var.admin_password
   }

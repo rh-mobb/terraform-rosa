@@ -153,18 +153,18 @@ variable "aws_subnet_ids" {
 }
 
 variable "admin_username" {
-  type = string
+  type        = string
   description = "The username for the admin user"
 }
 
 variable "admin_password" {
-  type = string
+  type        = string
   description = "The password for the admin user"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "default_aws_tags" {
-  type = map(string)
+  type        = map(string)
   description = "Default tags for AWS"
-  default = {}
+  default     = {}
 }

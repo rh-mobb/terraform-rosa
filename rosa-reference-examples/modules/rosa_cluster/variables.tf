@@ -12,7 +12,7 @@ variable "availability_zones" {
 
 #Cluster settings
 variable "cluster_name" {
-  type    = string
+  type = string
 }
 
 variable "rosa_openshift_version" {
@@ -21,11 +21,11 @@ variable "rosa_openshift_version" {
 }
 
 variable "account_role_prefix" {
-  type    = string
+  type = string
 }
 
 variable "operator_role_prefix" {
-  type    = string
+  type = string
 }
 
 variable "vpc_cidr_block" {

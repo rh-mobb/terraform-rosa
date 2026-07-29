@@ -20,7 +20,7 @@ locals {
 
 module "rosa-hcp" {
   source                 = "terraform-redhat/rosa-hcp/rhcs"
-  version                = "1.6.2-prerelease.1"
+  version                = "1.7.0"
   cluster_name           = local.cluster_name
   openshift_version      = var.openshift_version
   account_role_prefix    = local.cluster_name

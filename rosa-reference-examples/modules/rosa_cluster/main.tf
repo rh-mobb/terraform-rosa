@@ -37,10 +37,10 @@ resource "rhcs_cluster_rosa_classic" "rosa_sts_cluster" {
   }
   admin_credentials = var.admin_credentials
   #Private link settings
-  private          = var.enable_private_link
-  aws_private_link = var.enable_private_link
-  aws_subnet_ids   = var.aws_subnet_ids
-  machine_cidr     = var.enable_private_link ? var.vpc_cidr_block : null
+  private                  = var.enable_private_link
+  aws_private_link         = var.enable_private_link
+  aws_subnet_ids           = var.aws_subnet_ids
+  machine_cidr             = var.enable_private_link ? var.vpc_cidr_block : null
   wait_for_create_complete = true
 
   lifecycle {
