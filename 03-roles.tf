@@ -161,18 +161,10 @@ data "aws_iam_policy_document" "karpenter_trust" {
   }
 }
 
-# Official Red Hat Karpenter IAM policy sourced from managed-cluster-config.
-# Uses resource-tag conditions (red-hat-managed) to scope EC2 actions to only
-# nodes provisioned by Karpenter.
-resource "aws_iam_policy" "karpenter" {
-  # checkov:skip=CKV_AWS_274:Karpenter requires broad read permissions for EC2 resource discovery
-  count = var.hosted_control_plane && var.karpenter ? 1 : 0
-
-  name   = "${var.cluster_name}-karpenter"
-  policy = file("${path.module}/karpenter-policy.json")
-  tags   = var.tags
-}
-
+# Attach the AWS managed Karpenter controller policy.
+# ROSAKarpenterControllerPolicy is maintained by AWS and receives permission
+# updates as new Karpenter features ship. Prefer this over a customer-managed
+# policy document for clusters created with AutoNode.
 resource "aws_iam_role" "karpenter" {
   count = var.hosted_control_plane && var.karpenter ? 1 : 0
 
@@ -181,9 +173,11 @@ resource "aws_iam_role" "karpenter" {
   tags               = var.tags
 }
 
-resource "aws_iam_role_policy_attachment" "karpenter" {
+# Named distinctly from the former customer-managed attachment so existing
+# stacks attach the managed policy before Terraform removes the old one.
+resource "aws_iam_role_policy_attachment" "karpenter_managed" {
   count = var.hosted_control_plane && var.karpenter ? 1 : 0
 
   role       = aws_iam_role.karpenter[0].name
-  policy_arn = aws_iam_policy.karpenter[0].arn
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/ROSAKarpenterControllerPolicy"
 }
