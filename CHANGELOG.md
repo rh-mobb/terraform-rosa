@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Attach AWS managed `ROSAKarpenterControllerPolicy` to the AutoNode/Karpenter IAM role instead of a customer-managed policy from `karpenter-policy.json`
+
+### Removed
+- `karpenter-policy.json` customer-managed IAM policy document (replaced by the AWS managed policy)
+
 ## [1.0.0] - 2025-11-28
 
 ### Added

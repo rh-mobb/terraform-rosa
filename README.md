@@ -121,9 +121,11 @@ export TF_VAR_karpenter=true
 | Resource | Name | Purpose |
 |---|---|---|
 | `aws_iam_role` | `<cluster_name>-karpenter` | Karpenter controller role, trusted via OIDC |
-| `aws_iam_role_policy` | `<cluster_name>-karpenter` | EC2, SQS, pricing, and PassRole permissions |
+| `aws_iam_role_policy_attachment.karpenter_managed` | managed | Attaches AWS managed `ROSAKarpenterControllerPolicy` |
 
 The cluster's `auto_node` attribute is set automatically — no additional configuration is required after `terraform apply`.
+
+**Existing clusters:** If AutoNode was enabled before the AWS managed policy was available, the Karpenter role may still have a customer-managed policy. After upgrading this module, `terraform apply` attaches `ROSAKarpenterControllerPolicy` and removes the module-managed custom policy resource. If a customer-managed policy was created outside this module, follow the Red Hat KCS to detach it after the managed policy is attached.
 
 **Output:**
 
